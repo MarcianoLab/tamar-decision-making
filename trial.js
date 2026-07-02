@@ -68,7 +68,7 @@ function initTrial(qualtricsContext) {
 
     /* Select correct set based on group, block and if it's a practice */
     var trials;
-    if (window.isPractice) {
+    if (window.isPractice == true) {
         trials = SET_PRACTICE_TRIALS
     }
     else if (BLOCK === 1) {
