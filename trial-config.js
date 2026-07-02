@@ -1,23 +1,4 @@
-/* ============================================================
-   TRIAL CONFIGURATION
-   ----------------------------------------------------------
-   Edit this file to change image URLs or the trial list.
-   No other files need to be touched.
-
-   Load this BEFORE trial.js:
-       <script src="trial-config.js"></script>
-       <script src="trial.js"></script>
-   ============================================================ */
-
 window.TRIAL_CONFIG = {
-
-    /* ==========================================================
-       IMAGE URL LOOKUP
-       ----------------------------------------------------------
-       Maps each image filename to its hosted URL.
-       Use "MISSING" for images that are not yet uploaded;
-       a blank placeholder will be shown in their place.
-       ========================================================== */
     images: {
         "2394_neut.JPG": "https://hebrewuni.qualtrics.com/CP/Graphic.php?IM=IM_5lxgbEa3yaEPMIs",
         "None.jpg": "https://hebrewuni.qualtrics.com/CP/Graphic.php?IM=IM_4u30N2tqJoyGQHo",
@@ -72,8 +53,8 @@ window.TRIAL_CONFIG = {
          f2         – right flanker image filename  (key into `images`)
          ft         – flanker type: "neu" | "neg" | "none"
 
-       SET 2 is derived automatically in trial.js by adding 24
-       to every trial_num (trials 25-48 use the same images).
+       SET 2 (for trials 25-48) is derived automatically in trial.js by adding 24
+       to every trial_num.
        ========================================================== */
     trials: [
         { trial_num: 1, f1: "2394_neut.JPG", cp: "2036_neut.jpg", f2: "2394_neut.JPG", ft: "neu" },

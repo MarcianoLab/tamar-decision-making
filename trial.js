@@ -68,19 +68,14 @@ function initTrial(qualtricsContext) {
 
     /* Select correct set based on group, block and if it's a practice */
     var trials;
-    console.log(window.isPractice);
     if (window.isPractice) {
         trials = SET_PRACTICE_TRIALS
-        console.log("if1");
     }
     else if (BLOCK === 1) {
         trials = (group === 'A') ? SET1 : SET2;
-        console.log("if2");
     } else {
         trials = (group === 'A') ? SET2 : SET1;
-        console.log("if3");
     }
-    console.log(trials);
 
     /* ==========================================================
        GORILLA RANDOMIZATION
