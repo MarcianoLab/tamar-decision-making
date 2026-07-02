@@ -59,15 +59,19 @@ function initTrial(qualtricsContext) {
 
     var IMG = window.TRIAL_CONFIG.images;
     var SET1 = window.TRIAL_CONFIG.trials;
+    var SET_PRACTICE_TRIALS = window.TRIAL_CONFIG.practiceTrials;
 
     /* Set 2: same images, trial numbers 25-48 */
     var SET2 = SET1.map(function (t) {
         return { trial_num: t.trial_num + 24, f1: t.f1, cp: t.cp, f2: t.f2, ft: t.ft };
     });
 
-    /* Select correct set based on group and block */
+    /* Select correct set based on group, block and if it's a practice */
     var trials;
-    if (BLOCK === 1) {
+    if (window.isPractice) {
+        trials = SET_PRACTICE_TRIALS
+    }
+    else if (BLOCK === 1) {
         trials = (group === 'A') ? SET1 : SET2;
     } else {
         trials = (group === 'A') ? SET2 : SET1;
