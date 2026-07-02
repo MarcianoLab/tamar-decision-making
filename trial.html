@@ -1,28 +1,37 @@
-<!-- ============================================================
-     TRIAL UI - HTML structure for the trial overlay
-     Injected into the Qualtrics question body (or loaded externally).
-     ============================================================ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Risk Taking Task - Local Test</title>
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="trial.css">
+
+    <!-- External configurations (e.g. for standalone local testing) -->
+    <script>
+        window.block = 1;
+        window.isPractice = false; // Set to true to test practice trials
+    </script>
+    
+    <!-- Scripts -->
+    <script src="trial-config.js"></script>
+    <script src="trial.js"></script>
+</head>
+<body>
 
 <div id="trial-overlay">
 
     <!-- Fixation cross (shown for 1 000 ms before each trial) -->
     <div id="fixation">+</div>
 
-    <!-- Three-image row: left flanker | center picture | right flanker -->
+    <!-- Row: left flanker | lottery widget | right flanker -->
     <div id="image-row"></div>
 
-    <!-- Slider row: sad emoji — slider — happy emoji -->
-    <div id="slider-row">
-        <span class="slider-icon">😞</span>
-        <input id="rating-slider"
-               type="range"
-               min="-100"
-               max="100"
-               value="0"
-               step="1" />
-        <span class="slider-icon">😊</span>
-    </div>
-
-    <!-- Advance to next trial -->
+    <!-- Advance to next trial (appears after a lottery choice is made) -->
     <button id="next-btn">next</button>
+
 </div>
+
+</body>
+</html>

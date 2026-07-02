@@ -1,77 +1,65 @@
 /* ============================================================
-   BLOCK TRIALS – All 24 trials in one question
-   To use for Block 2: change BLOCK = 1 to BLOCK = 2
-   at the top of the CONFIGURATION section.
+   TRIAL ENGINE — Flanker images + Monetary lottery decision
+   ----------------------------------------------------------
+   Each trial shows:
+     Phase 1  Fixation cross (1 000 ms)
+     Phase 2  Left flanker | Lottery widget | Right flanker
+              (3 000 ms — visible but NOT interactive)
+     Phase 3  Flankers hidden, lottery becomes clickable.
+              Participant chooses Fixed $500 or the Lottery,
+              then clicks "next" to advance.
 
-   External-file version: expects trial.html to be injected
-   into the DOM and trial.css to be loaded before this runs.
+   Data saved per trial (Qualtrics embedded data):
+     choice_t{N}  — "fixed" or "lottery"
+     rt_t{N}      — ms from lottery becoming interactive to
+                     "next" button click
+
+   Expects trial-config.js and trial.html loaded first.
    ============================================================ */
 
-/* ==========================================================
-   Qualtrics hooks
-   ----------------------------------------------------------
-   • addOnload  – injects the CSS <link> into <head>
-   • addOnReady – runs the experiment logic once the DOM
-                  and the injected HTML are ready
-
-   If running outside Qualtrics (standalone testing), the
-   fallback at the bottom of this file calls initTrial()
-   directly.
-   ========================================================== */
-
-/* ----------------------------------------------------------
-   initTrial(qualtricsContext)
-   Main entry point.  `qualtricsContext` is either the
-   Qualtrics `this` object or null for standalone mode.
-   ---------------------------------------------------------- */
 function initTrial(qualtricsContext) {
 
     /* ==========================================================
        CONFIGURATION
-       Change BLOCK to 2 for the Block 2 question.
        ========================================================== */
     var BLOCK = window.block;
 
-    /* ==========================================================
-       GROUP ASSIGNMENT (set by Randomizer in Survey Flow)
-       ----------------------------------------------------------
-       In Qualtrics this is piped; for standalone testing you can
-       hardcode 'A' or 'B'.
-       ========================================================== */
+    /* Group assignment */
     var group;
     if (qualtricsContext) {
-        group = "${e://Field/group}";           // Qualtrics piped text
+        group = "${e://Field/group}";
     } else {
-        group = 'A';                            // standalone fallback
+        group = 'A';
     }
 
     /* ==========================================================
-       IMAGE URL LOOKUP  +  TRIAL DATA
-       ----------------------------------------------------------
-       Both are loaded from trial-config.js (window.TRIAL_CONFIG).
-       Make sure trial-config.js is included BEFORE trial.js.
+       LOAD CONFIG
        ========================================================== */
     if (!window.TRIAL_CONFIG) {
-        console.error('[trial.js] window.TRIAL_CONFIG is not defined. ' +
-            'Did you forget to load trial-config.js before trial.js?');
+        console.error('[trial.js] window.TRIAL_CONFIG not defined. ' +
+            'Load trial-config.js before trial.js.');
         return;
     }
 
     var IMG = window.TRIAL_CONFIG.images;
     var SET1 = window.TRIAL_CONFIG.trials;
     var SET_PRACTICE_TRIALS = window.TRIAL_CONFIG.practiceTrials;
+    var moneyIcons = window.TRIAL_CONFIG.moneyIcons;
 
-    /* Set 2: same images, trial numbers 25-48 */
+    /* Set 2: same trials, offset trial_num by 49 */
     var SET2 = SET1.map(function (t) {
-        return { trial_num: t.trial_num + 24, f1: t.f1, cp: t.cp, f2: t.f2, ft: t.ft };
+        return {
+            trial_num: t.trial_num + 49,
+            f1: t.f1, f2: t.f2, ft: t.ft,
+            lottery: t.lottery
+        };
     });
 
-    /* Select correct set based on group, block and if it's a practice */
+    /* Select correct set */
     var trials;
     if (window.isPractice) {
-        trials = SET_PRACTICE_TRIALS
-    }
-    else if (BLOCK === 1) {
+        trials = SET_PRACTICE_TRIALS;
+    } else if (BLOCK === 1) {
         trials = (group === 'A') ? SET1 : SET2;
     } else {
         trials = (group === 'A') ? SET2 : SET1;
@@ -79,76 +67,66 @@ function initTrial(qualtricsContext) {
 
     /* ==========================================================
        GORILLA RANDOMIZATION
-       Direct port of the original Gorilla preProcessSpreadsheet.
-       No more than 2 consecutive trials with the same flanker type.
+       No more than 2 consecutive same flanker type.
        ========================================================== */
     function randomizeTrials(spreadsheet) {
-        var modifiedSpreadsheet = [];
+        var result = [];
         var arr = [];
-        var spreadsheetLen = spreadsheet.length;
-        var flankerType = "";
+        var len = spreadsheet.length;
         var k = 0;
-        var i, j, random;
+        var i, j, rand, ft;
 
-        for (j = 0; j < spreadsheetLen; j++) {
-            arr.push(j);
-        }
+        for (j = 0; j < len; j++) arr.push(j);
 
-        while (modifiedSpreadsheet.length < spreadsheetLen) {
+        while (result.length < len) {
             k += 1;
             if (k > 100) {
                 arr = [];
-                for (j = 0; j < spreadsheetLen; j++) {
-                    arr.push(j);
-                }
-                modifiedSpreadsheet = [];
+                for (j = 0; j < len; j++) arr.push(j);
+                result = [];
                 k = 0;
                 continue;
             }
 
-            random = arr[Math.floor(Math.random() * arr.length)];
-            flankerType = spreadsheet[random].ft;
+            rand = arr[Math.floor(Math.random() * arr.length)];
+            ft = spreadsheet[rand].ft;
 
-            if (modifiedSpreadsheet.length < 2) {
-                modifiedSpreadsheet.push(spreadsheet[random]);
+            if (result.length < 2) {
+                result.push(spreadsheet[rand]);
                 for (i = 0; i < arr.length; i++) {
-                    if (arr[i] === random) {
-                        arr.splice(i, 1);
-                        break;
-                    }
+                    if (arr[i] === rand) { arr.splice(i, 1); break; }
                 }
                 continue;
             }
 
-            if (flankerType === modifiedSpreadsheet[modifiedSpreadsheet.length - 1].ft &&
-                flankerType === modifiedSpreadsheet[modifiedSpreadsheet.length - 2].ft) {
+            if (ft === result[result.length - 1].ft &&
+                ft === result[result.length - 2].ft) {
                 continue;
             }
 
-            modifiedSpreadsheet.push(spreadsheet[random]);
+            result.push(spreadsheet[rand]);
             for (i = 0; i < arr.length; i++) {
-                if (arr[i] === random) {
-                    arr.splice(i, 1);
-                    break;
-                }
+                if (arr[i] === rand) { arr.splice(i, 1); break; }
             }
         }
-
-        return modifiedSpreadsheet;
+        return result;
     }
 
     var orderedTrials = randomizeTrials(trials);
 
-    /* Save trial order for data analysis */
+    /* Save trial order */
     if (qualtricsContext) {
         Qualtrics.SurveyEngine.setJSEmbeddedData(
             'trial_order_b' + BLOCK,
             JSON.stringify(orderedTrials.map(function (t) {
                 return {
                     trial_num: t.trial_num,
-                    center: t.cp,
                     flanker: t.f1,
-                    flanker_type: t.ft
+                    flanker_type: t.ft,
+                    lottery_type: t.lottery.type,
+                    lottery_level: t.lottery.level,
+                    lottery_amount: t.lottery.amount,
+                    lottery_color: t.lottery.color_gain
                 };
             }))
         );
@@ -156,26 +134,21 @@ function initTrial(qualtricsContext) {
 
     /* ==========================================================
        DOM REFERENCES
-       These elements must exist in trial.html.
        ========================================================== */
-    var overlay = document.getElementById('trial-overlay');
+    var overlay  = document.getElementById('trial-overlay');
     var fixation = document.getElementById('fixation');
     var imageRow = document.getElementById('image-row');
-    var sliderRow = document.getElementById('slider-row');
-    var slider = document.getElementById('rating-slider');
-    var nextBtn = document.getElementById('next-btn');
+    var nextBtn  = document.getElementById('next-btn');
 
-    /* Hide the Qualtrics "Next" button */
     if (qualtricsContext) {
         qualtricsContext.hideNextButton();
     }
     document.body.style.backgroundColor = '#000';
 
     /* ==========================================================
-       IMAGE BUILDER
-       Returns an <img> element or a blank <div> placeholder.
+       IMAGE BUILDER (flankers)
        ========================================================== */
-    function buildImage(url, isCenter) {
+    function buildImage(url) {
         if (!url || url === 'MISSING') {
             var blank = document.createElement('div');
             blank.className = 'trial-img-blank';
@@ -183,25 +156,206 @@ function initTrial(qualtricsContext) {
         }
         var img = document.createElement('img');
         img.src = url;
-        img.className = 'trial-img ' + (isCenter ? 'center' : 'flanker');
+        img.className = 'trial-img flanker';
         return img;
+    }
+
+    /* ==========================================================
+       LOTTERY WIDGET BUILDER
+       ----------------------------------------------------------
+       Builds the center decision widget:
+         Left panel:  Fixed $500 (icon + label)
+         OR divider
+         Right panel: Lottery (top-icon, probability rect, bottom-icon)
+
+       Red is always the top color, blue the bottom.
+       - Risk:      red% and blue% are computed from level + color_gain.
+       - Ambiguity: grey bar occludes the middle; visible areas are equal.
+
+       Click handling uses event delegation on the widget container.
+       ========================================================== */
+    function buildLotteryWidget(lottery) {
+        var widget = document.createElement('div');
+        widget.className = 'lottery-widget';
+
+        /* --- Fixed option (left) --- */
+        var fixedOpt = document.createElement('div');
+        fixedOpt.className = 'lottery-option lottery-fixed';
+        fixedOpt.dataset.choice = 'fixed';
+
+        var fixedIcon = document.createElement('img');
+        fixedIcon.src = moneyIcons[500];
+        fixedIcon.className = 'lottery-money-icon';
+        fixedOpt.appendChild(fixedIcon);
+
+        var fixedLabel = document.createElement('div');
+        fixedLabel.className = 'lottery-amount-label';
+        fixedLabel.textContent = '$500';
+        fixedOpt.appendChild(fixedLabel);
+
+        /* --- OR divider --- */
+        var orDiv = document.createElement('div');
+        orDiv.className = 'lottery-or-divider';
+        orDiv.textContent = 'OR';
+
+        /* --- Lottery / gamble option (right) --- */
+        var gambleOpt = document.createElement('div');
+        gambleOpt.className = 'lottery-option lottery-gamble';
+        gambleOpt.dataset.choice = 'lottery';
+
+        // Determine which amount goes with which color
+        var topAmount, bottomAmount;
+        if (lottery.color_gain === 'red') {
+            topAmount  = lottery.amount;   // red = gain
+            bottomAmount = 0;              // blue = $0
+        } else {
+            topAmount  = 0;                // red = $0
+            bottomAmount = lottery.amount; // blue = gain
+        }
+
+        // Top outcome row
+        var topRow = document.createElement('div');
+        topRow.className = 'lottery-outcome-row';
+        var topIcon = document.createElement('img');
+        topIcon.src = moneyIcons[topAmount];
+        topIcon.className = 'lottery-money-icon small';
+        var topLabel = document.createElement('span');
+        topLabel.className = 'lottery-amount-label small';
+        topLabel.textContent = '$' + topAmount;
+        topRow.appendChild(topIcon);
+        topRow.appendChild(topLabel);
+        gambleOpt.appendChild(topRow);
+
+        // Probability rectangle
+        var rect = document.createElement('div');
+        rect.className = 'lottery-rect';
+
+        if (lottery.type === 'risk') {
+            // Risky: known probability split
+            var redPct, bluePct;
+            if (lottery.color_gain === 'red') {
+                redPct  = lottery.level;
+                bluePct = 100 - lottery.level;
+            } else {
+                redPct  = 100 - lottery.level;
+                bluePct = lottery.level;
+            }
+
+            var redSeg = document.createElement('div');
+            redSeg.className = 'lottery-segment segment-red';
+            redSeg.style.height = redPct + '%';
+            if (redPct > 0) {
+                var rl = document.createElement('span');
+                rl.className = 'lottery-pct';
+                rl.textContent = redPct;
+                redSeg.appendChild(rl);
+            }
+            rect.appendChild(redSeg);
+
+            var blueSeg = document.createElement('div');
+            blueSeg.className = 'lottery-segment segment-blue';
+            blueSeg.style.height = bluePct + '%';
+            if (bluePct > 0) {
+                var bl = document.createElement('span');
+                bl.className = 'lottery-pct';
+                bl.textContent = bluePct;
+                blueSeg.appendChild(bl);
+            }
+            rect.appendChild(blueSeg);
+
+        } else {
+            // Ambiguous: grey bar occludes the middle
+            var visEach = (100 - lottery.level) / 2;
+
+            if (visEach > 0) {
+                var rSeg = document.createElement('div');
+                rSeg.className = 'lottery-segment segment-red';
+                rSeg.style.height = visEach + '%';
+                var rLbl = document.createElement('span');
+                rLbl.className = 'lottery-pct';
+                rLbl.textContent = Math.round(visEach);
+                rSeg.appendChild(rLbl);
+                rect.appendChild(rSeg);
+            }
+
+            var greySeg = document.createElement('div');
+            greySeg.className = 'lottery-segment segment-grey';
+            greySeg.style.height = lottery.level + '%';
+            rect.appendChild(greySeg);
+
+            if (visEach > 0) {
+                var bSeg = document.createElement('div');
+                bSeg.className = 'lottery-segment segment-blue';
+                bSeg.style.height = visEach + '%';
+                var bLbl = document.createElement('span');
+                bLbl.className = 'lottery-pct';
+                bLbl.textContent = Math.round(visEach);
+                bSeg.appendChild(bLbl);
+                rect.appendChild(bSeg);
+            }
+        }
+
+        gambleOpt.appendChild(rect);
+
+        // Bottom outcome row
+        var botRow = document.createElement('div');
+        botRow.className = 'lottery-outcome-row';
+        var botIcon = document.createElement('img');
+        botIcon.src = moneyIcons[bottomAmount];
+        botIcon.className = 'lottery-money-icon small';
+        var botLabel = document.createElement('span');
+        botLabel.className = 'lottery-amount-label small';
+        botLabel.textContent = '$' + bottomAmount;
+        botRow.appendChild(botIcon);
+        botRow.appendChild(botLabel);
+        gambleOpt.appendChild(botRow);
+
+        /* --- Assemble widget --- */
+        widget.appendChild(fixedOpt);
+        widget.appendChild(orDiv);
+        widget.appendChild(gambleOpt);
+
+        /* --- Click handler (delegated) --- */
+        widget.addEventListener('click', function (e) {
+            if (!widget.classList.contains('interactive')) return;
+
+            // Walk up from click target to find .lottery-option
+            var target = e.target;
+            while (target && target !== widget) {
+                if (target.classList.contains('lottery-option')) {
+                    // Deselect all options
+                    var opts = widget.querySelectorAll('.lottery-option');
+                    for (var i = 0; i < opts.length; i++) {
+                        opts[i].classList.remove('selected');
+                    }
+                    // Select the clicked option
+                    target.classList.add('selected');
+                    selectedChoice = target.dataset.choice;
+                    nextBtn.style.display = 'block';
+                    return;
+                }
+                target = target.parentElement;
+            }
+        });
+
+        return widget;
     }
 
     /* ==========================================================
        TRIAL RUNNER
        ========================================================== */
-    var currentTrial = 0;
-    var sliderStartTime = 0;
+    var currentTrial    = 0;
+    var choiceStartTime = 0;
+    var selectedChoice  = null;
     var phase1Timer, phase2Timer;
 
     function runTrial() {
         if (currentTrial >= orderedTrials.length) {
-            /* All trials done — clean up and advance survey */
+            /* All trials done — clean up and advance */
             if (overlay) overlay.remove();
             var bgStyle = document.getElementById('trial-bg');
             if (bgStyle) bgStyle.remove();
             document.body.style.backgroundColor = '';
-
             if (qualtricsContext) {
                 qualtricsContext.clickNextButton();
             }
@@ -210,32 +364,38 @@ function initTrial(qualtricsContext) {
 
         var t = orderedTrials[currentTrial];
 
-        /* --- Reset for new trial --- */
-        fixation.style.display = 'flex';
-        imageRow.style.display = 'none';
-        imageRow.innerHTML = '';
-        sliderRow.style.display = 'none';
-        slider.value = '0';
-        slider.classList.remove('active');
-        nextBtn.style.display = 'none';
+        /* --- Reset --- */
+        fixation.style.display  = 'flex';
+        imageRow.style.display  = 'none';
+        imageRow.innerHTML      = '';
+        nextBtn.style.display   = 'none';
+        selectedChoice          = null;
 
-        /* Pre-build images for this trial */
-        imageRow.appendChild(buildImage(IMG[t.f1], false));
-        imageRow.appendChild(buildImage(IMG[t.cp], true));
-        imageRow.appendChild(buildImage(IMG[t.f2], false));
+        /* --- Build flanker images --- */
+        var leftFlanker  = buildImage(IMG[t.f1]);
+        var rightFlanker = buildImage(IMG[t.f2]);
 
-        /* Phase 1: fixation 1 000 ms */
-        phase1Timer = setTimeout(function runPhase2() {
+        /* --- Build lottery widget --- */
+        var lotteryWidget = buildLotteryWidget(t.lottery);
+
+        imageRow.appendChild(leftFlanker);
+        imageRow.appendChild(lotteryWidget);
+        imageRow.appendChild(rightFlanker);
+
+        /* Phase 1: fixation (1 000 ms) */
+        phase1Timer = setTimeout(function () {
             fixation.style.display = 'none';
             imageRow.style.display = 'flex';
-            sliderRow.style.display = 'flex';
 
-            /* Phase 2: images visible for 3 000 ms */
-            phase2Timer = setTimeout(function runPhase3() {
-                imageRow.style.display = 'none';
-                slider.classList.add('active');
-                nextBtn.style.display = 'block';
-                sliderStartTime = Date.now();
+            /* Phase 2: display (3 000 ms) — visible, NOT interactive */
+            phase2Timer = setTimeout(function () {
+                /* Hide flankers (keep layout space) */
+                leftFlanker.style.visibility  = 'hidden';
+                rightFlanker.style.visibility = 'hidden';
+
+                /* Enable lottery interaction */
+                lotteryWidget.classList.add('interactive');
+                choiceStartTime = Date.now();
             }, 3000);
         }, 1000);
     }
@@ -243,19 +403,26 @@ function initTrial(qualtricsContext) {
     /* ==========================================================
        RESPONSE HANDLER
        ========================================================== */
-    nextBtn.addEventListener('click', function handleNextClick() {
-        var rating = parseInt(slider.value, 10);
-        var rt = Date.now() - sliderStartTime;
-        var t = orderedTrials[currentTrial];
+    nextBtn.addEventListener('click', function () {
+        if (!selectedChoice) return;
+
+        var rt = Date.now() - choiceStartTime;
+        var t  = orderedTrials[currentTrial];
 
         if (qualtricsContext) {
-            Qualtrics.SurveyEngine.setJSEmbeddedData('rating_t' + t.trial_num, rating);
-            Qualtrics.SurveyEngine.setJSEmbeddedData('rt_t' + t.trial_num, rt);
+            Qualtrics.SurveyEngine.setJSEmbeddedData(
+                'choice_t' + t.trial_num, selectedChoice);
+            Qualtrics.SurveyEngine.setJSEmbeddedData(
+                'rt_t' + t.trial_num, rt);
         } else {
-            /* Standalone: log to console for debugging */
-            console.log('Trial ' + t.trial_num +
-                '  rating=' + rating +
-                '  rt=' + rt + 'ms');
+            console.log(
+                'Trial ' + t.trial_num +
+                '  choice=' + selectedChoice +
+                '  rt=' + rt + 'ms' +
+                '  [' + t.lottery.type + ' ' + t.lottery.level +
+                '% $' + t.lottery.amount +
+                ' ' + t.lottery.color_gain + ']'
+            );
         }
 
         currentTrial++;
@@ -265,28 +432,22 @@ function initTrial(qualtricsContext) {
     /* ==========================================================
        BLOCK ACCIDENTAL KEYBOARD ADVANCES
        ========================================================== */
-    document.addEventListener('keydown', function blockKeys(e) {
+    document.addEventListener('keydown', function (e) {
         if (e.which === 13 || e.which === 32) {
             e.preventDefault();
             e.stopPropagation();
         }
     });
 
-    /* Start the first trial */
+    /* Start */
     runTrial();
 }
 
 
 /* ==========================================================
    BOOTSTRAP
-   ----------------------------------------------------------
-   • Inside Qualtrics: the addOnload / addOnReady hooks call
-     initTrial() with the survey engine context.
-   • Standalone (loaded directly in a browser): detect that
-     Qualtrics is absent and self-start.
    ========================================================== */
 if (typeof Qualtrics === 'undefined') {
-    /* Standalone mode */
     document.addEventListener('DOMContentLoaded', function () {
         initTrial(null);
     });
