@@ -19,15 +19,35 @@
 window.TRIAL_CONFIG = {
 
     /* ==========================================================
-       MONEY ICON PATHS (relative to hosting root)
+       MONEY ICON PATHS (resolved dynamically relative to this script)
        ========================================================== */
-    moneyIcons: {
-        0:    "graphics/0.jpg",
-        500:  "graphics/500.jpg",
-        800:  "graphics/800.jpg",
-        1200: "graphics/1200.jpg",
-        2500: "graphics/2500.jpg"
-    },
+    moneyIcons: (function() {
+        var basePath = "";
+        if (document.currentScript && document.currentScript.src) {
+            basePath = document.currentScript.src;
+        } else {
+            var scripts = document.getElementsByTagName('script');
+            for (var i = 0; i < scripts.length; i++) {
+                if (scripts[i].src && scripts[i].src.indexOf('trial-config.js') !== -1) {
+                    basePath = scripts[i].src;
+                    break;
+                }
+            }
+        }
+        
+        var dirPath = "";
+        if (basePath) {
+            dirPath = basePath.substring(0, basePath.lastIndexOf('/') + 1);
+        }
+        
+        return {
+            0:    dirPath + "graphics/0.jpg",
+            500:  dirPath + "graphics/500.jpg",
+            800:  dirPath + "graphics/800.jpg",
+            1200: dirPath + "graphics/1200.jpg",
+            2500: dirPath + "graphics/2500.jpg"
+        };
+    })(),
 
     /* ==========================================================
        FLANKER IMAGE URL LOOKUP
