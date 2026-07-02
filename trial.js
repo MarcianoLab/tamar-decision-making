@@ -135,10 +135,10 @@ function initTrial(qualtricsContext) {
     /* ==========================================================
        DOM REFERENCES
        ========================================================== */
-    var overlay  = document.getElementById('trial-overlay');
+    var overlay = document.getElementById('trial-overlay');
     var fixation = document.getElementById('fixation');
     var imageRow = document.getElementById('image-row');
-    var nextBtn  = document.getElementById('next-btn');
+    var nextBtn = document.getElementById('next-btn');
 
     if (qualtricsContext) {
         qualtricsContext.hideNextButton();
@@ -206,16 +206,16 @@ function initTrial(qualtricsContext) {
         // Determine which amount goes with which color
         var topAmount, bottomAmount;
         if (lottery.color_gain === 'red') {
-            topAmount  = lottery.amount;   // red = gain
+            topAmount = lottery.amount;   // red = gain
             bottomAmount = 0;              // blue = $0
         } else {
-            topAmount  = 0;                // red = $0
+            topAmount = 0;                // red = $0
             bottomAmount = lottery.amount; // blue = gain
         }
 
         // Top outcome row
         var topRow = document.createElement('div');
-        topRow.className = 'lottery-outcome-row';
+        topRow.className = 'lottery-outcome-column';
         var topIcon = document.createElement('img');
         topIcon.src = moneyIcons[topAmount];
         topIcon.className = 'lottery-money-icon small';
@@ -234,10 +234,10 @@ function initTrial(qualtricsContext) {
             // Risky: known probability split
             var redPct, bluePct;
             if (lottery.color_gain === 'red') {
-                redPct  = lottery.level;
+                redPct = lottery.level;
                 bluePct = 100 - lottery.level;
             } else {
-                redPct  = 100 - lottery.level;
+                redPct = 100 - lottery.level;
                 bluePct = lottery.level;
             }
 
@@ -299,7 +299,7 @@ function initTrial(qualtricsContext) {
 
         // Bottom outcome row
         var botRow = document.createElement('div');
-        botRow.className = 'lottery-outcome-row';
+        botRow.className = 'lottery-outcome-column flex-reverse';
         var botIcon = document.createElement('img');
         botIcon.src = moneyIcons[bottomAmount];
         botIcon.className = 'lottery-money-icon small';
@@ -311,9 +311,9 @@ function initTrial(qualtricsContext) {
         gambleOpt.appendChild(botRow);
 
         /* --- Assemble widget --- */
-        widget.appendChild(fixedOpt);
-        widget.appendChild(orDiv);
         widget.appendChild(gambleOpt);
+        widget.appendChild(orDiv);
+        widget.appendChild(fixedOpt);
 
         /* --- Click handler (delegated) --- */
         widget.addEventListener('click', function (e) {
@@ -344,9 +344,9 @@ function initTrial(qualtricsContext) {
     /* ==========================================================
        TRIAL RUNNER
        ========================================================== */
-    var currentTrial    = 0;
+    var currentTrial = 0;
     var choiceStartTime = 0;
-    var selectedChoice  = null;
+    var selectedChoice = null;
     var phase1Timer, phase2Timer;
 
     function runTrial() {
@@ -365,14 +365,14 @@ function initTrial(qualtricsContext) {
         var t = orderedTrials[currentTrial];
 
         /* --- Reset --- */
-        fixation.style.display  = 'flex';
-        imageRow.style.display  = 'none';
-        imageRow.innerHTML      = '';
-        nextBtn.style.display   = 'none';
-        selectedChoice          = null;
+        fixation.style.display = 'flex';
+        imageRow.style.display = 'none';
+        imageRow.innerHTML = '';
+        nextBtn.style.display = 'none';
+        selectedChoice = null;
 
         /* --- Build flanker images --- */
-        var leftFlanker  = buildImage(IMG[t.f1]);
+        var leftFlanker = buildImage(IMG[t.f1]);
         var rightFlanker = buildImage(IMG[t.f2]);
 
         /* --- Build lottery widget --- */
@@ -390,7 +390,7 @@ function initTrial(qualtricsContext) {
             /* Phase 2: display (3 000 ms) — visible, NOT interactive */
             phase2Timer = setTimeout(function () {
                 /* Hide flankers (keep layout space) */
-                leftFlanker.style.visibility  = 'hidden';
+                leftFlanker.style.visibility = 'hidden';
                 rightFlanker.style.visibility = 'hidden';
 
                 /* Enable lottery interaction */
@@ -407,7 +407,7 @@ function initTrial(qualtricsContext) {
         if (!selectedChoice) return;
 
         var rt = Date.now() - choiceStartTime;
-        var t  = orderedTrials[currentTrial];
+        var t = orderedTrials[currentTrial];
 
         if (qualtricsContext) {
             Qualtrics.SurveyEngine.setJSEmbeddedData(
@@ -439,8 +439,60 @@ function initTrial(qualtricsContext) {
         }
     });
 
-    /* Start */
-    runTrial();
+    /* ==========================================================
+       PRELOAD IMAGES
+       ========================================================== */
+    function preloadImages(urls, callback) {
+        var loaded = 0;
+        var uniqueUrls = [];
+
+        for (var i = 0; i < urls.length; i++) {
+            if (urls[i] && urls[i] !== 'MISSING' && uniqueUrls.indexOf(urls[i]) === -1) {
+                uniqueUrls.push(urls[i]);
+            }
+        }
+
+        if (uniqueUrls.length === 0) {
+            callback();
+            return;
+        }
+
+        function onImgLoad() {
+            loaded++;
+            if (loaded >= uniqueUrls.length) {
+                callback();
+            }
+        }
+
+        for (var j = 0; j < uniqueUrls.length; j++) {
+            var img = new Image();
+            img.onload = onImgLoad;
+            img.onerror = onImgLoad;
+            img.src = uniqueUrls[j];
+        }
+    }
+
+    /* ==========================================================
+       START
+       ========================================================== */
+    // Hide fixation while loading so the screen is just black
+    fixation.style.display = 'none';
+
+    var urlsToPreload = [];
+    for (var i = 0; i < orderedTrials.length; i++) {
+        urlsToPreload.push(IMG[orderedTrials[i].f1]);
+        urlsToPreload.push(IMG[orderedTrials[i].f2]);
+    }
+    for (var k in moneyIcons) {
+        if (moneyIcons.hasOwnProperty(k)) {
+            urlsToPreload.push(moneyIcons[k]);
+        }
+    }
+
+    preloadImages(urlsToPreload, function () {
+        // Preloading done. runTrial() will automatically show the fixation cross.
+        runTrial();
+    });
 }
 
 
