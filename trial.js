@@ -4,7 +4,7 @@
    Each trial shows:
      Phase 1  Fixation cross (1 000 ms)
      Phase 2  Left flanker | Lottery widget | Right flanker
-              (3 000 ms — visible but NOT interactive)
+              (1 500 ms — visible but NOT interactive)
      Phase 3  Flankers hidden, lottery becomes clickable.
               Participant chooses Fixed $500 or the Lottery,
               then clicks "next" to advance.
@@ -41,10 +41,38 @@ function initTrial(qualtricsContext) {
         return;
     }
 
+    var flankerInteractiveMs = window.TRIAL_CONFIG.flankerInteractiveMs !== undefined ? window.TRIAL_CONFIG.flankerInteractiveMs : 5000;
+    var fixationMs = window.TRIAL_CONFIG.fixationMs !== undefined ? window.TRIAL_CONFIG.fixationMs : 1000;
+    var displayNonInteractiveMs = window.TRIAL_CONFIG.displayNonInteractiveMs !== undefined ? window.TRIAL_CONFIG.displayNonInteractiveMs : 1500;
+    var fixedAmount = window.TRIAL_CONFIG.fixedAmount !== undefined ? window.TRIAL_CONFIG.fixedAmount : 5;
     var IMG = window.TRIAL_CONFIG.images;
     var SET1 = window.TRIAL_CONFIG.trials;
     var SET_PRACTICE_TRIALS = window.TRIAL_CONFIG.practiceTrials;
-    var moneyIcons = window.TRIAL_CONFIG.moneyIcons;
+
+    /* Resolve money icon paths relative to trial.js */
+    var moneyIcons = (function () {
+        var base = '';
+        if (document.currentScript && document.currentScript.src) {
+            base = document.currentScript.src;
+        } else {
+            var scripts = document.getElementsByTagName('script');
+            for (var i = 0; i < scripts.length; i++) {
+                if (scripts[i].src && scripts[i].src.indexOf('trial.js') !== -1) {
+                    base = scripts[i].src;
+                    break;
+                }
+            }
+        }
+        var dir = base ? base.substring(0, base.lastIndexOf('/') + 1) : '';
+        var files = window.TRIAL_CONFIG.moneyIconFiles || {};
+        var resolved = {};
+        for (var k in files) {
+            if (files.hasOwnProperty(k)) {
+                resolved[k] = dir + files[k];
+            }
+        }
+        return resolved;
+    })();
 
     /* Set 2: same trials, offset trial_num by 49 */
     var SET2 = SET1.map(function (t) {
@@ -184,13 +212,13 @@ function initTrial(qualtricsContext) {
         fixedOpt.dataset.choice = 'fixed';
 
         var fixedIcon = document.createElement('img');
-        fixedIcon.src = moneyIcons[500];
+        fixedIcon.src = moneyIcons[fixedAmount];
         fixedIcon.className = 'lottery-money-icon';
         fixedOpt.appendChild(fixedIcon);
 
         var fixedLabel = document.createElement('div');
         fixedLabel.className = 'lottery-amount-label';
-        fixedLabel.textContent = '$500';
+        fixedLabel.textContent = '-$' + fixedAmount;
         fixedOpt.appendChild(fixedLabel);
 
         /* --- OR divider --- */
@@ -221,7 +249,7 @@ function initTrial(qualtricsContext) {
         topIcon.className = 'lottery-money-icon small';
         var topLabel = document.createElement('span');
         topLabel.className = 'lottery-amount-label small';
-        topLabel.textContent = '$' + topAmount;
+        topLabel.textContent = topAmount > 0 ? '-$' + topAmount : '$0';
         topRow.appendChild(topIcon);
         topRow.appendChild(topLabel);
         gambleOpt.appendChild(topRow);
@@ -230,7 +258,7 @@ function initTrial(qualtricsContext) {
         var rect = document.createElement('div');
         rect.className = 'lottery-rect';
 
-        if (lottery.type === 'risk') {
+        if (lottery.type === 'risk' || lottery.type === 'control') {
             // Risky: known probability split
             var redPct, bluePct;
             if (lottery.color_gain === 'red') {
@@ -305,7 +333,7 @@ function initTrial(qualtricsContext) {
         botIcon.className = 'lottery-money-icon small';
         var botLabel = document.createElement('span');
         botLabel.className = 'lottery-amount-label small';
-        botLabel.textContent = '$' + bottomAmount;
+        botLabel.textContent = bottomAmount > 0 ? '-$' + bottomAmount : '$0';
         botRow.appendChild(botIcon);
         botRow.appendChild(botLabel);
         gambleOpt.appendChild(botRow);
@@ -347,7 +375,7 @@ function initTrial(qualtricsContext) {
     var currentTrial = 0;
     var choiceStartTime = 0;
     var selectedChoice = null;
-    var phase1Timer, phase2Timer;
+    var phase1Timer, phase2Timer, flankerHideTimer;
 
     function runTrial() {
         if (currentTrial >= orderedTrials.length) {
@@ -365,6 +393,9 @@ function initTrial(qualtricsContext) {
         var t = orderedTrials[currentTrial];
 
         /* --- Reset --- */
+        if (flankerHideTimer) {
+            clearTimeout(flankerHideTimer);
+        }
         fixation.style.display = 'flex';
         imageRow.style.display = 'none';
         imageRow.innerHTML = '';
@@ -382,22 +413,29 @@ function initTrial(qualtricsContext) {
         imageRow.appendChild(lotteryWidget);
         imageRow.appendChild(rightFlanker);
 
-        /* Phase 1: fixation (1 000 ms) */
+        /* Phase 1: fixation */
         phase1Timer = setTimeout(function () {
             fixation.style.display = 'none';
             imageRow.style.display = 'flex';
 
-            /* Phase 2: display (3 000 ms) — visible, NOT interactive */
+            /* Phase 2: display — visible, NOT interactive */
             phase2Timer = setTimeout(function () {
-                /* Hide flankers (keep layout space) */
-                leftFlanker.style.visibility = 'hidden';
-                rightFlanker.style.visibility = 'hidden';
-
                 /* Enable lottery interaction */
                 lotteryWidget.classList.add('interactive');
                 choiceStartTime = Date.now();
-            }, 3000);
-        }, 1000);
+
+                /* Flankers visibility behavior */
+                if (flankerInteractiveMs > 0) {
+                    flankerHideTimer = setTimeout(function () {
+                        leftFlanker.style.visibility = 'hidden';
+                        rightFlanker.style.visibility = 'hidden';
+                    }, flankerInteractiveMs);
+                } else {
+                    leftFlanker.style.visibility = 'hidden';
+                    rightFlanker.style.visibility = 'hidden';
+                }
+            }, displayNonInteractiveMs);
+        }, fixationMs);
     }
 
     /* ==========================================================
