@@ -94,14 +94,16 @@ button[id*="Next"] {
 }
 
 .trial-img.flanker {
-    width: 260px;
-    height: 260px;
+    width: auto;
+    height: auto;
+    max-height: 400px;
+    object-fit: fill;
     border: none;
 }
 
 .trial-img-blank {
-    width: 260px;
-    height: 260px;
+    width: 400px;
+    height: 400px;
     display: inline-block;
 }
 

@@ -190,18 +190,19 @@ function initTrial(qualtricsContext) {
 
     /* ==========================================================
        LOTTERY WIDGET BUILDER
-       ----------------------------------------------------------
-       Builds the center decision widget:
-         Left panel:  Fixed $500 (icon + label)
-         OR divider
-         Right panel: Lottery (top-icon, probability rect, bottom-icon)
+        ----------------------------------------------------------
+        Builds the center decision widget:
+          Left panel:  Fixed $500 (icon + label)
+          OR divider
+          Right panel: Lottery (top-icon, probability rect, bottom-icon)
 
-       Red is always the top color, blue the bottom.
-       - Risk:      red% and blue% are computed from level + color_gain.
-       - Ambiguity: grey bar occludes the middle; visible areas are equal.
+        Gain is always displayed on top; its color is color_gain (red or blue).
+        The opposite color is always the bottom (loss / $0) outcome.
+        - Risk:      top segment = level%, bottom segment = (100-level)%.
+        - Ambiguity: grey bar occludes the middle; visible areas are equal.
 
-       Click handling uses event delegation on the widget container.
-       ========================================================== */
+        Click handling uses event delegation on the widget container.
+        ========================================================== */
     function buildLotteryWidget(lottery) {
         var widget = document.createElement('div');
         widget.className = 'lottery-widget';
@@ -218,7 +219,7 @@ function initTrial(qualtricsContext) {
 
         var fixedLabel = document.createElement('div');
         fixedLabel.className = 'lottery-amount-label';
-        fixedLabel.textContent = '-$' + fixedAmount;
+        fixedLabel.textContent = '$' + fixedAmount;
         fixedOpt.appendChild(fixedLabel);
 
         /* --- OR divider --- */
@@ -231,15 +232,11 @@ function initTrial(qualtricsContext) {
         gambleOpt.className = 'lottery-option lottery-gamble';
         gambleOpt.dataset.choice = 'lottery';
 
-        // Determine which amount goes with which color
-        var topAmount, bottomAmount;
-        if (lottery.color_gain === 'red') {
-            topAmount = lottery.amount;   // red = gain
-            bottomAmount = 0;              // blue = $0
-        } else {
-            topAmount = 0;                // red = $0
-            bottomAmount = lottery.amount; // blue = gain
-        }
+        // Gain is always on top; color_gain sets the top segment's color
+        var topAmount = lottery.amount;   // gain always on top
+        var bottomAmount = 0;             // loss ($0) always on bottom
+        var topColor = lottery.color_gain;                          // 'red' or 'blue'
+        var bottomColor = lottery.color_gain === 'red' ? 'blue' : 'red';
 
         // Top outcome row
         var topRow = document.createElement('div');
@@ -249,7 +246,7 @@ function initTrial(qualtricsContext) {
         topIcon.className = 'lottery-money-icon small';
         var topLabel = document.createElement('span');
         topLabel.className = 'lottery-amount-label small';
-        topLabel.textContent = topAmount > 0 ? '-$' + topAmount : '$0';
+        topLabel.textContent = topAmount > 0 ? '$' + topAmount : '$0';
         topRow.appendChild(topIcon);
         topRow.appendChild(topLabel);
         gambleOpt.appendChild(topRow);
@@ -259,51 +256,45 @@ function initTrial(qualtricsContext) {
         rect.className = 'lottery-rect';
 
         if (lottery.type === 'risk' || lottery.type === 'control') {
-            // Risky: known probability split
-            var redPct, bluePct;
-            if (lottery.color_gain === 'red') {
-                redPct = lottery.level;
-                bluePct = 100 - lottery.level;
-            } else {
-                redPct = 100 - lottery.level;
-                bluePct = lottery.level;
-            }
+            // Risky: top segment = gain color at level%, bottom = loss color at (100-level)%
+            var topPct = lottery.level;
+            var bottomPct = 100 - lottery.level;
 
-            var redSeg = document.createElement('div');
-            redSeg.className = 'lottery-segment segment-red';
-            redSeg.style.height = redPct + '%';
-            if (redPct > 0) {
+            var topSeg = document.createElement('div');
+            topSeg.className = 'lottery-segment segment-' + topColor;
+            topSeg.style.height = topPct + '%';
+            if (topPct > 0) {
                 var rl = document.createElement('span');
                 rl.className = 'lottery-pct';
-                rl.textContent = redPct;
-                redSeg.appendChild(rl);
+                rl.textContent = topPct;
+                topSeg.appendChild(rl);
             }
-            rect.appendChild(redSeg);
+            rect.appendChild(topSeg);
 
-            var blueSeg = document.createElement('div');
-            blueSeg.className = 'lottery-segment segment-blue';
-            blueSeg.style.height = bluePct + '%';
-            if (bluePct > 0) {
+            var botSeg = document.createElement('div');
+            botSeg.className = 'lottery-segment segment-' + bottomColor;
+            botSeg.style.height = bottomPct + '%';
+            if (bottomPct > 0) {
                 var bl = document.createElement('span');
                 bl.className = 'lottery-pct';
-                bl.textContent = bluePct;
-                blueSeg.appendChild(bl);
+                bl.textContent = bottomPct;
+                botSeg.appendChild(bl);
             }
-            rect.appendChild(blueSeg);
+            rect.appendChild(botSeg);
 
         } else {
-            // Ambiguous: grey bar occludes the middle
+            // Ambiguous: grey bar occludes the middle; top = gain color, bottom = loss color
             var visEach = (100 - lottery.level) / 2;
 
             if (visEach > 0) {
-                var rSeg = document.createElement('div');
-                rSeg.className = 'lottery-segment segment-red';
-                rSeg.style.height = visEach + '%';
-                var rLbl = document.createElement('span');
-                rLbl.className = 'lottery-pct';
-                rLbl.textContent = Math.round(visEach);
-                rSeg.appendChild(rLbl);
-                rect.appendChild(rSeg);
+                var tSeg = document.createElement('div');
+                tSeg.className = 'lottery-segment segment-' + topColor;
+                tSeg.style.height = visEach + '%';
+                var tLbl = document.createElement('span');
+                tLbl.className = 'lottery-pct';
+                tLbl.textContent = Math.round(visEach);
+                tSeg.appendChild(tLbl);
+                rect.appendChild(tSeg);
             }
 
             var greySeg = document.createElement('div');
@@ -313,7 +304,7 @@ function initTrial(qualtricsContext) {
 
             if (visEach > 0) {
                 var bSeg = document.createElement('div');
-                bSeg.className = 'lottery-segment segment-blue';
+                bSeg.className = 'lottery-segment segment-' + bottomColor;
                 bSeg.style.height = visEach + '%';
                 var bLbl = document.createElement('span');
                 bLbl.className = 'lottery-pct';
