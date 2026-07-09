@@ -97,12 +97,13 @@ button[id*="Next"] {
     width: auto;
     height: auto;
     max-height: 400px;
+    max-width: 377px;
     object-fit: fill;
     border: none;
 }
 
 .trial-img-blank {
-    width: 400px;
+    width: 377px;
     height: 400px;
     display: inline-block;
 }
@@ -120,6 +121,8 @@ button[id*="Next"] {
     justify-content: center;
     gap: 20px;
     flex-shrink: 0;
+    padding-left: 30px;
+    padding-right: 30px;
 }
 
 /* --- Option panel (shared) --- */
@@ -136,7 +139,7 @@ button[id*="Next"] {
     cursor: default;
     transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
     min-width: 130px;
-    height: 284px;
+    height: 264px;
 }
 
 /* Interactive state (Phase 3) */
