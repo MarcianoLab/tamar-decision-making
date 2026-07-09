@@ -36,16 +36,17 @@ window.TRIAL_CONFIG = {
       TIMING CONFIGURATION (ms)
       ----------------------------------------------------------
       fixationMs               - how long the fixation cross is shown before the trial.
-      displayNonInteractiveMs  - how long the flanker images + lottery widget are shown
-                                 before becoming interactive.
-      flankerInteractiveMs     - how long the flanker images remain on screen (while
-                                 allowing interaction with the lottery widget) after the
-                                 non-interactive period. Accepts 0 (removes flankers
-                                 immediately).
+      flankerOnlyMs            - how long the flankers are shown ALONE (no lottery)
+                                 after the fixation cross.
+      displayNonInteractiveMs  - how long the full display (flankers + lottery widget)
+                                 is shown before the lottery becomes interactive.
+      flankerInteractiveMs     - kept for compatibility; set to 0 to never hide flankers
+                                 (flankers now remain visible for the entire trial).
       ========================================================== */
    fixationMs: 1000,
-   displayNonInteractiveMs: 1500,
-   flankerInteractiveMs: 30000,
+   flankerOnlyMs: 1500,
+   displayNonInteractiveMs: 2000,
+   flankerInteractiveMs: 0,
 
    /* ==========================================================
       TRIAL SETTINGS

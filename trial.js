@@ -2,11 +2,12 @@
    TRIAL ENGINE — Flanker images + Monetary lottery decision
    ----------------------------------------------------------
    Each trial shows:
-     Phase 1  Fixation cross (1 000 ms)
-     Phase 2  Left flanker | Lottery widget | Right flanker
-              (1 500 ms — visible but NOT interactive)
-     Phase 3  Flankers hidden, lottery becomes clickable.
-              Participant chooses Fixed $500 or the Lottery,
+     Phase 1  Fixation cross            (fixationMs)
+     Phase 2  Flankers only, no lottery (flankerOnlyMs)
+     Phase 3  Flankers + lottery widget, NOT interactive
+                                        (displayNonInteractiveMs)
+     Phase 4  Lottery becomes clickable; flankers stay visible.
+              Participant chooses Fixed or the Lottery,
               then clicks "next" to advance.
 
    Data saved per trial (Qualtrics embedded data):
@@ -41,9 +42,9 @@ function initTrial(qualtricsContext) {
         return;
     }
 
-    var flankerInteractiveMs = window.TRIAL_CONFIG.flankerInteractiveMs !== undefined ? window.TRIAL_CONFIG.flankerInteractiveMs : 5000;
     var fixationMs = window.TRIAL_CONFIG.fixationMs !== undefined ? window.TRIAL_CONFIG.fixationMs : 1000;
-    var displayNonInteractiveMs = window.TRIAL_CONFIG.displayNonInteractiveMs !== undefined ? window.TRIAL_CONFIG.displayNonInteractiveMs : 1500;
+    var flankerOnlyMs = window.TRIAL_CONFIG.flankerOnlyMs !== undefined ? window.TRIAL_CONFIG.flankerOnlyMs : 2000;
+    var displayNonInteractiveMs = window.TRIAL_CONFIG.displayNonInteractiveMs !== undefined ? window.TRIAL_CONFIG.displayNonInteractiveMs : 2000;
     var fixedAmount = window.TRIAL_CONFIG.fixedAmount !== undefined ? window.TRIAL_CONFIG.fixedAmount : 5;
     var IMG = window.TRIAL_CONFIG.images;
     var SET1 = window.TRIAL_CONFIG.trials;
@@ -327,7 +328,7 @@ function initTrial(qualtricsContext) {
     var currentTrial = 0;
     var choiceStartTime = 0;
     var selectedChoice = null;
-    var phase1Timer, phase2Timer, flankerHideTimer;
+    var phase1Timer, phase2Timer, phase3Timer;
 
     function runTrial() {
         if (currentTrial >= orderedTrials.length) {
@@ -345,8 +346,8 @@ function initTrial(qualtricsContext) {
         var t = orderedTrials[currentTrial];
 
         /* --- Reset --- */
-        if (flankerHideTimer) {
-            clearTimeout(flankerHideTimer);
+        if (phase3Timer) {
+            clearTimeout(phase3Timer);
         }
         fixation.style.display = 'flex';
         imageRow.style.display = 'none';
@@ -358,8 +359,9 @@ function initTrial(qualtricsContext) {
         var leftFlanker = buildImage(IMG[t.f1]);
         var rightFlanker = buildImage(IMG[t.f2]);
 
-        /* --- Build lottery widget --- */
+        /* --- Build lottery widget (hidden initially) --- */
         var lotteryWidget = buildLotteryWidget(t.lottery);
+        lotteryWidget.style.visibility = 'hidden';
 
         imageRow.appendChild(leftFlanker);
         imageRow.appendChild(lotteryWidget);
@@ -368,25 +370,20 @@ function initTrial(qualtricsContext) {
         /* Phase 1: fixation */
         phase1Timer = setTimeout(function () {
             fixation.style.display = 'none';
-            imageRow.style.display = 'flex';
+            imageRow.style.display = 'flex'; // flankers visible, lottery hidden
 
-            /* Phase 2: display — visible, NOT interactive */
+            /* Phase 2: flankers only — lottery still hidden */
             phase2Timer = setTimeout(function () {
-                /* Enable lottery interaction */
-                lotteryWidget.classList.add('interactive');
-                choiceStartTime = Date.now();
+                /* Reveal lottery (non-interactive) */
+                lotteryWidget.style.visibility = 'visible';
 
-                /* Flankers visibility behavior */
-                if (flankerInteractiveMs > 0) {
-                    flankerHideTimer = setTimeout(function () {
-                        leftFlanker.style.visibility = 'hidden';
-                        rightFlanker.style.visibility = 'hidden';
-                    }, flankerInteractiveMs);
-                } else {
-                    leftFlanker.style.visibility = 'hidden';
-                    rightFlanker.style.visibility = 'hidden';
-                }
-            }, displayNonInteractiveMs);
+                /* Phase 3: lottery visible but NOT interactive */
+                phase3Timer = setTimeout(function () {
+                    /* Enable lottery interaction; flankers stay visible */
+                    lotteryWidget.classList.add('interactive');
+                    choiceStartTime = Date.now();
+                }, displayNonInteractiveMs);
+            }, flankerOnlyMs);
         }, fixationMs);
     }
 
