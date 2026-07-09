@@ -56,20 +56,6 @@ window.TRIAL_CONFIG = {
    fixedAmount: 5,
 
    /* ==========================================================
-      MONEY ICON FILENAMES
-      ----------------------------------------------------------
-      Maps each monetary amount to a graphics filename.
-      Path resolution is handled automatically by trial.js.
-      ========================================================== */
-   moneyIconFiles: {
-      0: "graphics/0.jpg",
-      5: "graphics/5.jpg",
-      8: "graphics/8.jpg",
-      20: "graphics/20.jpg",
-      50: "graphics/50.jpg"
-   },
-
-   /* ==========================================================
       FLANKER IMAGE URL LOOKUP
       ========================================================== */
    images: {

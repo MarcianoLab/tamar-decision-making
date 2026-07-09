@@ -136,6 +136,7 @@ button[id*="Next"] {
     cursor: default;
     transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
     min-width: 130px;
+    height: 284px;
 }
 
 /* Interactive state (Phase 3) */
@@ -166,29 +167,17 @@ button[id*="Next"] {
     user-select: none;
 }
 
-/* --- Money icons --- */
-.lottery-money-icon {
-    width: 64px;
-    height: 64px;
-    object-fit: contain;
-}
-
-.lottery-money-icon.small {
-    width: 48px;
-    height: 48px;
-}
-
 /* --- Dollar-amount label --- */
 .lottery-amount-label {
     color: #fff;
-    font-size: 20px;
+    font-size: 25px;
     font-weight: bold;
     text-align: center;
     margin: 4px 0;
 }
 
 .lottery-amount-label.small {
-    font-size: 16px;
+    font-size: 25px;
 }
 
 /* --- Outcome row (icon + label next to rect) --- */

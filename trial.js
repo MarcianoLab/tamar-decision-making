@@ -49,31 +49,6 @@ function initTrial(qualtricsContext) {
     var SET1 = window.TRIAL_CONFIG.trials;
     var SET_PRACTICE_TRIALS = window.TRIAL_CONFIG.practiceTrials;
 
-    /* Resolve money icon paths relative to trial.js */
-    var moneyIcons = (function () {
-        var base = '';
-        if (document.currentScript && document.currentScript.src) {
-            base = document.currentScript.src;
-        } else {
-            var scripts = document.getElementsByTagName('script');
-            for (var i = 0; i < scripts.length; i++) {
-                if (scripts[i].src && scripts[i].src.indexOf('trial.js') !== -1) {
-                    base = scripts[i].src;
-                    break;
-                }
-            }
-        }
-        var dir = base ? base.substring(0, base.lastIndexOf('/') + 1) : '';
-        var files = window.TRIAL_CONFIG.moneyIconFiles || {};
-        var resolved = {};
-        for (var k in files) {
-            if (files.hasOwnProperty(k)) {
-                resolved[k] = dir + files[k];
-            }
-        }
-        return resolved;
-    })();
-
     /* Set 2: same trials, offset trial_num by 49 */
     var SET2 = SET1.map(function (t) {
         return {
@@ -212,11 +187,6 @@ function initTrial(qualtricsContext) {
         fixedOpt.className = 'lottery-option lottery-fixed';
         fixedOpt.dataset.choice = 'fixed';
 
-        var fixedIcon = document.createElement('img');
-        fixedIcon.src = moneyIcons[fixedAmount];
-        fixedIcon.className = 'lottery-money-icon';
-        fixedOpt.appendChild(fixedIcon);
-
         var fixedLabel = document.createElement('div');
         fixedLabel.className = 'lottery-amount-label';
         fixedLabel.textContent = '$' + fixedAmount;
@@ -225,7 +195,6 @@ function initTrial(qualtricsContext) {
         /* --- OR divider --- */
         var orDiv = document.createElement('div');
         orDiv.className = 'lottery-or-divider';
-        orDiv.textContent = 'OR';
 
         /* --- Lottery / gamble option (right) --- */
         var gambleOpt = document.createElement('div');
@@ -241,13 +210,9 @@ function initTrial(qualtricsContext) {
         // Top outcome row
         var topRow = document.createElement('div');
         topRow.className = 'lottery-outcome-column';
-        var topIcon = document.createElement('img');
-        topIcon.src = moneyIcons[topAmount];
-        topIcon.className = 'lottery-money-icon small';
         var topLabel = document.createElement('span');
         topLabel.className = 'lottery-amount-label small';
         topLabel.textContent = topAmount > 0 ? '$' + topAmount : '$0';
-        topRow.appendChild(topIcon);
         topRow.appendChild(topLabel);
         gambleOpt.appendChild(topRow);
 
@@ -319,13 +284,9 @@ function initTrial(qualtricsContext) {
         // Bottom outcome row
         var botRow = document.createElement('div');
         botRow.className = 'lottery-outcome-column flex-reverse';
-        var botIcon = document.createElement('img');
-        botIcon.src = moneyIcons[bottomAmount];
-        botIcon.className = 'lottery-money-icon small';
         var botLabel = document.createElement('span');
         botLabel.className = 'lottery-amount-label small';
         botLabel.textContent = bottomAmount > 0 ? '-$' + bottomAmount : '$0';
-        botRow.appendChild(botIcon);
         botRow.appendChild(botLabel);
         gambleOpt.appendChild(botRow);
 
@@ -511,11 +472,6 @@ function initTrial(qualtricsContext) {
     for (var i = 0; i < orderedTrials.length; i++) {
         urlsToPreload.push(IMG[orderedTrials[i].f1]);
         urlsToPreload.push(IMG[orderedTrials[i].f2]);
-    }
-    for (var k in moneyIcons) {
-        if (moneyIcons.hasOwnProperty(k)) {
-            urlsToPreload.push(moneyIcons[k]);
-        }
     }
 
     preloadImages(urlsToPreload, function () {
