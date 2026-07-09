@@ -1,7 +1,7 @@
 /* ============================================================
    TRIAL CONFIGURATION  —  Dan et al. (2025) loss-only design
    ----------------------------------------------------------
-   Edit this file to change timings, image URLs, money icon filenames, or trials.
+   Edit this file to change timings, image URLs,  icon filenames, or trials.
    Load BEFORE trial.js.
 
    FRAME: Loss
