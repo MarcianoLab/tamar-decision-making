@@ -33,6 +33,10 @@ async function initTrial(qualtricsContext) {
         group = 'A';
     }
 
+    /* color_gain is a between-subject variable derived from group:
+       Group A → blue (gain side), all others → red */
+    var colorGain = (group === 'A') ? 'blue' : 'red';
+
     /* ==========================================================
        LOAD CONFIG
        ========================================================== */
@@ -45,6 +49,7 @@ async function initTrial(qualtricsContext) {
     var fixationMs = window.TRIAL_CONFIG.fixationMs !== undefined ? window.TRIAL_CONFIG.fixationMs : 1000;
     var flankerOnlyMs = window.TRIAL_CONFIG.flankerOnlyMs !== undefined ? window.TRIAL_CONFIG.flankerOnlyMs : 2000;
     var displayNonInteractiveMs = window.TRIAL_CONFIG.displayNonInteractiveMs !== undefined ? window.TRIAL_CONFIG.displayNonInteractiveMs : 2000;
+    var autoAdvanceDelayMs = window.TRIAL_CONFIG.autoAdvanceDelayMs !== undefined ? window.TRIAL_CONFIG.autoAdvanceDelayMs : 500;
     var fixedAmount = window.TRIAL_CONFIG.fixedAmount !== undefined ? window.TRIAL_CONFIG.fixedAmount : 5;
     var IMG = window.TRIAL_CONFIG.images;
     var SET1 = window.TRIAL_CONFIG.trials;
@@ -118,6 +123,23 @@ async function initTrial(qualtricsContext) {
 
     var orderedTrials = randomizeTrials(trials);
 
+    /* Generate counterbalanced fixed-side assignment:
+       Exactly half the trials have the fixed option on the left,
+       the other half on the right. Shuffled randomly. */
+    var fixedOnLeftAssignment = (function () {
+        var n = orderedTrials.length;
+        var arr = [];
+        for (var i = 0; i < n; i++) {
+            arr.push(i < Math.floor(n / 2));
+        }
+        // Fisher-Yates shuffle
+        for (var j = arr.length - 1; j > 0; j--) {
+            var k = Math.floor(Math.random() * (j + 1));
+            var tmp = arr[j]; arr[j] = arr[k]; arr[k] = tmp;
+        }
+        return arr;
+    })();
+
     /* Save trial order */
     if (qualtricsContext) {
         Qualtrics.SurveyEngine.setJSEmbeddedData(
@@ -179,7 +201,7 @@ async function initTrial(qualtricsContext) {
 
         Click handling uses event delegation on the widget container.
         ========================================================== */
-    function buildLotteryWidget(lottery) {
+    function buildLotteryWidget(lottery, fixedOnLeft) {
         var widget = document.createElement('div');
         widget.className = 'lottery-widget';
 
@@ -202,11 +224,11 @@ async function initTrial(qualtricsContext) {
         gambleOpt.className = 'lottery-option lottery-gamble';
         gambleOpt.dataset.choice = 'lottery';
 
-        // Gain is always on top; color_gain sets the top segment's color
+        // Gain is always on top; colorGain (derived from group) sets the top segment's color
         var topAmount = lottery.amount;   // gain always on top
         var bottomAmount = 0;             // loss ($0) always on bottom
-        var topColor = lottery.color_gain;                          // 'red' or 'blue'
-        var bottomColor = lottery.color_gain === 'red' ? 'blue' : 'red';
+        var topColor = colorGain;                               // 'red' or 'blue'
+        var bottomColor = colorGain === 'red' ? 'blue' : 'red';
 
         // Top outcome row
         var topRow = document.createElement('div');
@@ -229,23 +251,11 @@ async function initTrial(qualtricsContext) {
             var topSeg = document.createElement('div');
             topSeg.className = 'lottery-segment segment-' + topColor;
             topSeg.style.height = topPct + '%';
-            if (topPct > 0) {
-                var rl = document.createElement('span');
-                rl.className = 'lottery-pct';
-                rl.textContent = topPct;
-                topSeg.appendChild(rl);
-            }
             rect.appendChild(topSeg);
 
             var botSeg = document.createElement('div');
             botSeg.className = 'lottery-segment segment-' + bottomColor;
             botSeg.style.height = bottomPct + '%';
-            if (bottomPct > 0) {
-                var bl = document.createElement('span');
-                bl.className = 'lottery-pct';
-                bl.textContent = bottomPct;
-                botSeg.appendChild(bl);
-            }
             rect.appendChild(botSeg);
 
         } else {
@@ -256,10 +266,6 @@ async function initTrial(qualtricsContext) {
                 var tSeg = document.createElement('div');
                 tSeg.className = 'lottery-segment segment-' + topColor;
                 tSeg.style.height = visEach + '%';
-                var tLbl = document.createElement('span');
-                tLbl.className = 'lottery-pct';
-                tLbl.textContent = Math.round(visEach);
-                tSeg.appendChild(tLbl);
                 rect.appendChild(tSeg);
             }
 
@@ -272,10 +278,6 @@ async function initTrial(qualtricsContext) {
                 var bSeg = document.createElement('div');
                 bSeg.className = 'lottery-segment segment-' + bottomColor;
                 bSeg.style.height = visEach + '%';
-                var bLbl = document.createElement('span');
-                bLbl.className = 'lottery-pct';
-                bLbl.textContent = Math.round(visEach);
-                bSeg.appendChild(bLbl);
                 rect.appendChild(bSeg);
             }
         }
@@ -291,10 +293,16 @@ async function initTrial(qualtricsContext) {
         botRow.appendChild(botLabel);
         gambleOpt.appendChild(botRow);
 
-        /* --- Assemble widget --- */
-        widget.appendChild(gambleOpt);
-        widget.appendChild(orDiv);
-        widget.appendChild(fixedOpt);
+        /* --- Assemble widget (order depends on counterbalancing) --- */
+        if (fixedOnLeft) {
+            widget.appendChild(fixedOpt);
+            widget.appendChild(orDiv);
+            widget.appendChild(gambleOpt);
+        } else {
+            widget.appendChild(gambleOpt);
+            widget.appendChild(orDiv);
+            widget.appendChild(fixedOpt);
+        }
 
         /* --- Click handler (delegated) --- */
         widget.addEventListener('click', function (e) {
@@ -312,7 +320,34 @@ async function initTrial(qualtricsContext) {
                     // Select the clicked option
                     target.classList.add('selected');
                     selectedChoice = target.dataset.choice;
-                    nextBtn.style.display = 'block';
+
+                    // Automatically advance to the next trial after 500ms
+                    setTimeout(function () {
+                        var rt = Date.now() - choiceStartTime;
+                        var t = orderedTrials[currentTrial];
+
+                        if (qualtricsContext) {
+                            Qualtrics.SurveyEngine.setJSEmbeddedData(
+                                'choice_t' + t.trial_num, selectedChoice);
+                            Qualtrics.SurveyEngine.setJSEmbeddedData(
+                                'rt_t' + t.trial_num, rt);
+                            Qualtrics.SurveyEngine.setJSEmbeddedData(
+                                'fixed_side_t' + t.trial_num,
+                                fixedOnLeftAssignment[currentTrial] ? 'left' : 'right');
+                        } else {
+                            console.log(
+                                'Trial ' + t.trial_num +
+                                '  choice=' + selectedChoice +
+                                '  rt=' + rt + 'ms' +
+                                '  fixed_side=' + (fixedOnLeftAssignment[currentTrial] ? 'left' : 'right') +
+                                '  [' + t.lottery.type + ' ' + t.lottery.level +
+                                '% $' + t.lottery.amount + ']'
+                            );
+                        }
+
+                        currentTrial++;
+                        runTrial();
+                    }, autoAdvanceDelayMs);
                     return;
                 }
                 target = target.parentElement;
@@ -360,7 +395,8 @@ async function initTrial(qualtricsContext) {
         var rightFlanker = buildImage(IMG[t.f2]);
 
         /* --- Build lottery widget (hidden initially) --- */
-        var lotteryWidget = buildLotteryWidget(t.lottery);
+        var fixedOnLeft = fixedOnLeftAssignment[currentTrial];
+        var lotteryWidget = buildLotteryWidget(t.lottery, fixedOnLeft);
         lotteryWidget.style.visibility = 'hidden';
 
         imageRow.appendChild(leftFlanker);
@@ -386,35 +422,6 @@ async function initTrial(qualtricsContext) {
             }, flankerOnlyMs);
         }, fixationMs);
     }
-
-    /* ==========================================================
-       RESPONSE HANDLER
-       ========================================================== */
-    nextBtn.addEventListener('click', function () {
-        if (!selectedChoice) return;
-
-        var rt = Date.now() - choiceStartTime;
-        var t = orderedTrials[currentTrial];
-
-        if (qualtricsContext) {
-            Qualtrics.SurveyEngine.setJSEmbeddedData(
-                'choice_t' + t.trial_num, selectedChoice);
-            Qualtrics.SurveyEngine.setJSEmbeddedData(
-                'rt_t' + t.trial_num, rt);
-        } else {
-            console.log(
-                'Trial ' + t.trial_num +
-                '  choice=' + selectedChoice +
-                '  rt=' + rt + 'ms' +
-                '  [' + t.lottery.type + ' ' + t.lottery.level +
-                '% $' + t.lottery.amount +
-                ' ' + t.lottery.color_gain + ']'
-            );
-        }
-
-        currentTrial++;
-        runTrial();
-    });
 
     /* ==========================================================
        BLOCK ACCIDENTAL KEYBOARD ADVANCES
