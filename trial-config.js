@@ -74,7 +74,6 @@ window.TRIAL_CONFIG = {
       "6831_neg.bmp": "MISSING",
       "3550_neg.bmp": "MISSING",
       "6571_neg.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_L0pRWLQA0s4i306",
-      "9400_neg.bmp": "MISSING",
       "9332_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_NVE4R3ecPnMhCPF",
       "9419_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_cU2Ps8SRJkKqbZe",
       "9425_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_P4BwqDy4lpG2D49",
@@ -145,85 +144,64 @@ window.TRIAL_CONFIG = {
       '9428_neg.jpg': 'https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_2z3nDPI3p6C5Bfq',
       '9429_neg.jpg': 'https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_G4coNCnzIvAcivC',
       '9435_neg.JPG': 'https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_1P55YiBXlOYQ0U3',
+      "9400_neg.bmp": "MISSING",
    },
 
    /* ==========================================================
       49 LOSS TRIALS  (Dan et al. 2025 structure)
       ----------------------------------------------------------
-      Trials  1– 7: control  – 50/50 risk ($5 loss vs $0), flanker types cycle, lottery identical across all 7
-      Trials  8–13: risk     – $8  loss, levels 25/50/75 × 2 color reps
-      Trials 14–19: risk     – $20 loss, levels 25/50/75 × 2 color reps
-      Trials 20–25: risk     – $50 loss, levels 25/50/75 × 2 color reps
-      Trials 26–33: ambiguity– $8  loss, levels 24/50/74/100 × 2 color reps
-      Trials 34–41: ambiguity– $20 loss, levels 24/50/74/100 × 2 color reps
-      Trials 42–49: ambiguity– $50 loss, levels 24/50/74/100 × 2 color reps
-
-      Flanker types cycle: none → neu → neg → none → …
       SET 2 is derived in trial.js by adding 49 to trial_num.
       ========================================================== */
    trials: [
-      /* --- Control: 50/50 risk ($5 loss or $0) — same lottery for all 7, flanker type cycles --- */
-      { trial_num: 1, f1: "None.jpg", f2: "None.jpg", ft: "none", lottery: { type: "control", level: 50, amount: 5, color_gain: "red" } },
-      { trial_num: 2, f1: "2394_neut.JPG", f2: "2394_neut.JPG", ft: "neu", lottery: { type: "control", level: 50, amount: 5, color_gain: "red" } },
-      { trial_num: 3, f1: "2700_neg.JPG", f2: "2700_neg.JPG", ft: "neg", lottery: { type: "control", level: 50, amount: 5, color_gain: "red" } },
-      { trial_num: 4, f1: "None.jpg", f2: "None.jpg", ft: "none", lottery: { type: "control", level: 50, amount: 5, color_gain: "red" } },
-      { trial_num: 5, f1: "2359_neut.jpg", f2: "2359_neut.jpg", ft: "neu", lottery: { type: "control", level: 50, amount: 5, color_gain: "red" } },
-      { trial_num: 6, f1: "2276_neg.JPG", f2: "2276_neg.JPG", ft: "neg", lottery: { type: "control", level: 50, amount: 5, color_gain: "red" } },
-      { trial_num: 7, f1: "None.jpg", f2: "None.jpg", ft: "none", lottery: { type: "control", level: 50, amount: 5, color_gain: "red" } },
-
-      /* --- Risk: $8 loss (levels 25/50/75 × 2 color reps = 6 trials) --- */
-      { trial_num: 8, f1: "4605_neut.JPG", f2: "4605_neut.JPG", ft: "neu", lottery: { type: "risk", level: 25, amount: 8, color_gain: "red" } },
-      { trial_num: 9, f1: "6831_neg.bmp", f2: "6831_neg.bmp", ft: "neg", lottery: { type: "risk", level: 25, amount: 8, color_gain: "blue" } },
-      { trial_num: 10, f1: "None.jpg", f2: "None.jpg", ft: "none", lottery: { type: "risk", level: 50, amount: 8, color_gain: "red" } },
-      { trial_num: 11, f1: "2305_neut.jpg", f2: "2305_neut.jpg", ft: "neu", lottery: { type: "risk", level: 50, amount: 8, color_gain: "blue" } },
-      { trial_num: 12, f1: "3550_neg.bmp", f2: "3550_neg.bmp", ft: "neg", lottery: { type: "risk", level: 75, amount: 8, color_gain: "red" } },
-      { trial_num: 13, f1: "None.jpg", f2: "None.jpg", ft: "none", lottery: { type: "risk", level: 75, amount: 8, color_gain: "blue" } },
-
-      /* --- Risk: $20 loss (levels 25/50/75 × 2 color reps = 6 trials) --- */
-      { trial_num: 14, f1: "2026_neut.jpg", f2: "2026_neut.jpg", ft: "neu", lottery: { type: "risk", level: 25, amount: 20, color_gain: "red" } },
-      { trial_num: 15, f1: "6571_neg.JPG", f2: "6571_neg.JPG", ft: "neg", lottery: { type: "risk", level: 25, amount: 20, color_gain: "blue" } },
-      { trial_num: 16, f1: "None.jpg", f2: "None.jpg", ft: "none", lottery: { type: "risk", level: 50, amount: 20, color_gain: "red" } },
-      { trial_num: 17, f1: "7493_neut.JPG", f2: "7493_neut.JPG", ft: "neu", lottery: { type: "risk", level: 50, amount: 20, color_gain: "blue" } },
-      { trial_num: 18, f1: "9400_neg.bmp", f2: "9400_neg.bmp", ft: "neg", lottery: { type: "risk", level: 75, amount: 20, color_gain: "red" } },
-      { trial_num: 19, f1: "None.jpg", f2: "None.jpg", ft: "none", lottery: { type: "risk", level: 75, amount: 20, color_gain: "blue" } },
-
-      /* --- Risk: $50 loss (levels 25/50/75 × 2 color reps = 6 trials) --- */
-      { trial_num: 20, f1: "2273_neut.jpg", f2: "2273_neut.jpg", ft: "neu", lottery: { type: "risk", level: 25, amount: 50, color_gain: "red" } },
-      { trial_num: 21, f1: "9332_neg.jpg", f2: "9332_neg.jpg", ft: "neg", lottery: { type: "risk", level: 25, amount: 50, color_gain: "blue" } },
-      { trial_num: 22, f1: "None.jpg", f2: "None.jpg", ft: "none", lottery: { type: "risk", level: 50, amount: 50, color_gain: "red" } },
-      { trial_num: 23, f1: "2749_neut.JPG", f2: "2749_neut.JPG", ft: "neu", lottery: { type: "risk", level: 50, amount: 50, color_gain: "blue" } },
-      { trial_num: 24, f1: "9419_neg.jpg", f2: "9419_neg.jpg", ft: "neg", lottery: { type: "risk", level: 75, amount: 50, color_gain: "red" } },
-      { trial_num: 25, f1: "None.jpg", f2: "None.jpg", ft: "none", lottery: { type: "risk", level: 75, amount: 50, color_gain: "blue" } },
-
-      /* --- Ambiguity: $8 loss (levels 24/50/74/100 × 2 color reps = 8 trials) --- */
-      { trial_num: 26, f1: "2394_neut.JPG", f2: "2394_neut.JPG", ft: "neu", lottery: { type: "ambiguity", level: 24, amount: 8, color_gain: "red" } },
-      { trial_num: 27, f1: "2700_neg.JPG", f2: "2700_neg.JPG", ft: "neg", lottery: { type: "ambiguity", level: 24, amount: 8, color_gain: "blue" } },
-      { trial_num: 28, f1: "None.jpg", f2: "None.jpg", ft: "none", lottery: { type: "ambiguity", level: 50, amount: 8, color_gain: "red" } },
-      { trial_num: 29, f1: "2359_neut.jpg", f2: "2359_neut.jpg", ft: "neu", lottery: { type: "ambiguity", level: 50, amount: 8, color_gain: "blue" } },
-      { trial_num: 30, f1: "2276_neg.JPG", f2: "2276_neg.JPG", ft: "neg", lottery: { type: "ambiguity", level: 74, amount: 8, color_gain: "red" } },
-      { trial_num: 31, f1: "None.jpg", f2: "None.jpg", ft: "none", lottery: { type: "ambiguity", level: 74, amount: 8, color_gain: "blue" } },
-      { trial_num: 32, f1: "4605_neut.JPG", f2: "4605_neut.JPG", ft: "neu", lottery: { type: "ambiguity", level: 100, amount: 8, color_gain: "red" } },
-      { trial_num: 33, f1: "6831_neg.bmp", f2: "6831_neg.bmp", ft: "neg", lottery: { type: "ambiguity", level: 100, amount: 8, color_gain: "blue" } },
-
-      /* --- Ambiguity: $20 loss (levels 24/50/74/100 × 2 color reps = 8 trials) --- */
-      { trial_num: 34, f1: "None.jpg", f2: "None.jpg", ft: "none", lottery: { type: "ambiguity", level: 24, amount: 20, color_gain: "red" } },
-      { trial_num: 35, f1: "2305_neut.jpg", f2: "2305_neut.jpg", ft: "neu", lottery: { type: "ambiguity", level: 24, amount: 20, color_gain: "blue" } },
-      { trial_num: 36, f1: "3550_neg.bmp", f2: "3550_neg.bmp", ft: "neg", lottery: { type: "ambiguity", level: 50, amount: 20, color_gain: "red" } },
-      { trial_num: 37, f1: "None.jpg", f2: "None.jpg", ft: "none", lottery: { type: "ambiguity", level: 50, amount: 20, color_gain: "blue" } },
-      { trial_num: 38, f1: "2026_neut.jpg", f2: "2026_neut.jpg", ft: "neu", lottery: { type: "ambiguity", level: 74, amount: 20, color_gain: "red" } },
-      { trial_num: 39, f1: "6571_neg.JPG", f2: "6571_neg.JPG", ft: "neg", lottery: { type: "ambiguity", level: 74, amount: 20, color_gain: "blue" } },
-      { trial_num: 40, f1: "None.jpg", f2: "None.jpg", ft: "none", lottery: { type: "ambiguity", level: 100, amount: 20, color_gain: "red" } },
-      { trial_num: 41, f1: "7493_neut.JPG", f2: "7493_neut.JPG", ft: "neu", lottery: { type: "ambiguity", level: 100, amount: 20, color_gain: "blue" } },
-
-      /* --- Ambiguity: $50 loss (levels 24/50/74/100 × 2 color reps = 8 trials) --- */
-      { trial_num: 42, f1: "9400_neg.bmp", f2: "9400_neg.bmp", ft: "neg", lottery: { type: "ambiguity", level: 24, amount: 50, color_gain: "red" } },
-      { trial_num: 43, f1: "None.jpg", f2: "None.jpg", ft: "none", lottery: { type: "ambiguity", level: 24, amount: 50, color_gain: "blue" } },
-      { trial_num: 44, f1: "2273_neut.jpg", f2: "2273_neut.jpg", ft: "neu", lottery: { type: "ambiguity", level: 50, amount: 50, color_gain: "red" } },
-      { trial_num: 45, f1: "9332_neg.jpg", f2: "9332_neg.jpg", ft: "neg", lottery: { type: "ambiguity", level: 50, amount: 50, color_gain: "blue" } },
-      { trial_num: 46, f1: "None.jpg", f2: "None.jpg", ft: "none", lottery: { type: "ambiguity", level: 74, amount: 50, color_gain: "red" } },
-      { trial_num: 47, f1: "2749_neut.JPG", f2: "2749_neut.JPG", ft: "neu", lottery: { type: "ambiguity", level: 74, amount: 50, color_gain: "blue" } },
-      { trial_num: 48, f1: "9419_neg.jpg", f2: "9419_neg.jpg", ft: "neg", lottery: { type: "ambiguity", level: 100, amount: 50, color_gain: "red" } },
-      { trial_num: 49, f1: "None.jpg", f2: "None.jpg", ft: "none", lottery: { type: "ambiguity", level: 100, amount: 50, color_gain: "blue" } }
+      { trial_num: 1, f1: "2382_neut.jpg", f2: "2382_neut.jpg", ft: "neu", lottery: { type: "risk", level: 75, amount: 50, color_gain: "red" } },
+      { trial_num: 2, f1: "8230_neg.bmp", f2: "8230_neg.bmp", ft: "neg", lottery: { type: "ambiguity", level: 100, amount: 20, color_gain: "blue" } },
+      { trial_num: 3, f1: "2489_neut.jpg", f2: "2489_neut.jpg", ft: "neu", lottery: { type: "ambiguity", level: 74, amount: 8, color_gain: "red" } },
+      { trial_num: 4, f1: "2345.1_neg.jpg", f2: "2345.1_neg.jpg", ft: "neg", lottery: { type: "risk", level: 50, amount: 8, color_gain: "red" } },
+      { trial_num: 5, f1: "2305_neut.jpg", f2: "2305_neut.jpg", ft: "neu", lottery: { type: "risk", level: 50, amount: 50, color_gain: "red" } },
+      { trial_num: 6, f1: "2485_neut.JPG", f2: "2485_neut.JPG", ft: "neu", lottery: { type: "ambiguity", level: 50, amount: 50, color_gain: "red" } },
+      { trial_num: 7, f1: "3550_neg.bmp", f2: "3550_neg.bmp", ft: "neg", lottery: { type: "ambiguity", level: 50, amount: 50, color_gain: "blue" } },
+      { trial_num: 8, f1: "2495_neut.JPG", f2: "2495_neut.JPG", ft: "neu", lottery: { type: "ambiguity", level: 74, amount: 20, color_gain: "red" } },
+      { trial_num: 9, f1: "2102_neut.jpg", f2: "2102_neut.jpg", ft: "neu", lottery: { type: "risk", level: 25, amount: 20, color_gain: "red" } },
+      { trial_num: 10, f1: "2700_neg.JPG", f2: "2700_neg.JPG", ft: "neg", lottery: { type: "risk", level: 75, amount: 20, color_gain: "red" } },
+      { trial_num: 11, f1: "2435_neut.JPG", f2: "2435_neut.JPG", ft: "neu", lottery: { type: "ambiguity", level: 50, amount: 20, color_gain: "red" } },
+      { trial_num: 12, f1: "3216_neg.jpg", f2: "3216_neg.jpg", ft: "neg", lottery: { type: "ambiguity", level: 24, amount: 50, color_gain: "blue" } },
+      { trial_num: 13, f1: "2394_neut.JPG", f2: "2394_neut.JPG", ft: "neu", lottery: { type: "ambiguity", level: 24, amount: 20, color_gain: "red" } },
+      { trial_num: 14, f1: "2276_neg.JPG", f2: "2276_neg.JPG", ft: "neg", lottery: { type: "risk", level: 25, amount: 50, color_gain: "blue" } },
+      { trial_num: 15, f1: "2900_neg.JPG", f2: "2900_neg.JPG", ft: "neg", lottery: { type: "ambiguity", level: 24, amount: 20, color_gain: "red" } },
+      { trial_num: 16, f1: "2393_neut.JPG", f2: "2393_neut.JPG", ft: "neu", lottery: { type: "ambiguity", level: 24, amount: 8, color_gain: "red" } },
+      { trial_num: 17, f1: "2710_neg.JPG", f2: "2710_neg.JPG", ft: "neg", lottery: { type: "risk", level: 75, amount: 50, color_gain: "red" } },
+      { trial_num: 18, f1: "2377_neut.jpg", f2: "2377_neut.jpg", ft: "neu", lottery: { type: "risk", level: 75, amount: 20, color_gain: "red" } },
+      { trial_num: 19, f1: "2489_neut.jpg", f2: "2489_neut.jpg", ft: "neu", lottery: { type: "ambiguity", level: 74, amount: 8, color_gain: "blue" } },
+      { trial_num: 20, f1: "3220_neg.JPG", f2: "3220_neg.JPG", ft: "neg", lottery: { type: "control", level: 50, amount: 5, color_gain: "red" } },
+      { trial_num: 21, f1: "2382_neut.jpg", f2: "2382_neut.jpg", ft: "neu", lottery: { type: "risk", level: 75, amount: 50, color_gain: "blue" } },
+      { trial_num: 22, f1: "2455_neg.JPG", f2: "2455_neg.JPG", ft: "neg", lottery: { type: "risk", level: 50, amount: 50, color_gain: "red" } },
+      { trial_num: 23, f1: "2717_neg.jpg", f2: "2717_neg.jpg", ft: "neg", lottery: { type: "control", level: 50, amount: 5, color_gain: "red" } },
+      { trial_num: 24, f1: "2570_neut.JPG", f2: "2570_neut.JPG", ft: "neu", lottery: { type: "ambiguity", level: 100, amount: 20, color_gain: "blue" } },
+      { trial_num: 25, f1: "2375.1_neg.jpg", f2: "2375.1_neg.jpg", ft: "neg", lottery: { type: "risk", level: 50, amount: 20, color_gain: "red" } },
+      { trial_num: 26, f1: "2055.1_neg.jpg", f2: "2055.1_neg.jpg", ft: "neg", lottery: { type: "risk", level: 25, amount: 8, color_gain: "red" } },
+      { trial_num: 27, f1: "2359_neut.jpg", f2: "2359_neut.jpg", ft: "neu", lottery: { type: "risk", level: 75, amount: 8, color_gain: "red" } },
+      { trial_num: 28, f1: "6571_neg.JPG", f2: "6571_neg.JPG", ft: "neg", lottery: { type: "ambiguity", level: 74, amount: 20, color_gain: "blue" } },
+      { trial_num: 29, f1: "2107_neut.jpg", f2: "2107_neut.jpg", ft: "neu", lottery: { type: "risk", level: 25, amount: 50, color_gain: "blue" } },
+      { trial_num: 30, f1: "2495_neut.JPG", f2: "2495_neut.JPG", ft: "neu", lottery: { type: "ambiguity", level: 74, amount: 20, color_gain: "blue" } },
+      { trial_num: 31, f1: "2700_neg.JPG", f2: "2700_neg.JPG", ft: "neg", lottery: { type: "risk", level: 75, amount: 20, color_gain: "blue" } },
+      { trial_num: 32, f1: "2396_neut.jpg", f2: "2396_neut.jpg", ft: "neu", lottery: { type: "ambiguity", level: 24, amount: 50, color_gain: "blue" } },
+      { trial_num: 33, f1: "3300_neg.JPG", f2: "3300_neg.JPG", ft: "neg", lottery: { type: "ambiguity", level: 50, amount: 20, color_gain: "red" } },
+      { trial_num: 34, f1: "2214_neut.jpg", f2: "2214_neut.jpg", ft: "neu", lottery: { type: "risk", level: 50, amount: 8, color_gain: "blue" } },
+      { trial_num: 35, f1: "2053_neg.jpg", f2: "2053_neg.jpg", ft: "neg", lottery: { type: "control", level: 50, amount: 5, color_gain: "red" } },
+      { trial_num: 36, f1: "2036_neut.jpg", f2: "2036_neut.jpg", ft: "neu", lottery: { type: "risk", level: 25, amount: 8, color_gain: "blue" } },
+      { trial_num: 37, f1: "2305_neut.jpg", f2: "2305_neut.jpg", ft: "neu", lottery: { type: "risk", level: 50, amount: 50, color_gain: "blue" } },
+      { trial_num: 38, f1: "2799_neg.jpg", f2: "2799_neg.jpg", ft: "neg", lottery: { type: "ambiguity", level: 24, amount: 8, color_gain: "red" } },
+      { trial_num: 39, f1: "2485_neut.JPG", f2: "2485_neut.JPG", ft: "neu", lottery: { type: "ambiguity", level: 50, amount: 50, color_gain: "blue" } },
+      { trial_num: 40, f1: "2359_neut.jpg", f2: "2359_neut.jpg", ft: "neu", lottery: { type: "risk", level: 75, amount: 8, color_gain: "blue" } },
+      { trial_num: 41, f1: "6831_neg.bmp", f2: "6831_neg.bmp", ft: "neg", lottery: { type: "control", level: 50, amount: 5, color_gain: "red" } },
+      { trial_num: 42, f1: "2488_neut.jpg", f2: "2488_neut.jpg", ft: "neu", lottery: { type: "control", level: 50, amount: 5, color_gain: "red" } },
+      { trial_num: 43, f1: "2900_neg.JPG", f2: "2900_neg.JPG", ft: "neg", lottery: { type: "ambiguity", level: 24, amount: 20, color_gain: "blue" } },
+      { trial_num: 44, f1: "2435_neut.JPG", f2: "2435_neut.JPG", ft: "neu", lottery: { type: "ambiguity", level: 50, amount: 20, color_gain: "blue" } },
+      { trial_num: 45, f1: "3216_neg.jpg", f2: "3216_neg.jpg", ft: "neg", lottery: { type: "ambiguity", level: 24, amount: 50, color_gain: "red" } },
+      { trial_num: 46, f1: "9041_neg.JPG", f2: "9041_neg.JPG", ft: "neg", lottery: { type: "ambiguity", level: 100, amount: 50, color_gain: "blue" } },
+      { trial_num: 47, f1: "2308_neut.jpg", f2: "2308_neut.jpg", ft: "neu", lottery: { type: "control", level: 50, amount: 5, color_gain: "red" } },
+      { trial_num: 48, f1: "2456_neg.jpg", f2: "2456_neg.jpg", ft: "neg", lottery: { type: "control", level: 50, amount: 5, color_gain: "red" } },
+      { trial_num: 49, f1: "6561_neg.JPG", f2: "6561_neg.JPG", ft: "neg", lottery: { type: "ambiguity", level: 74, amount: 8, color_gain: "blue" } }
    ],
 
    /* ==========================================================
