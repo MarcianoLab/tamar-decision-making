@@ -240,3 +240,53 @@ window.TRIAL_CONFIG = {
    ]
 
 };
+
+// Dynamically create lists of unique image URLs used in practice and regular trials
+(function () {
+    var config = window.TRIAL_CONFIG;
+    if (!config) return;
+
+    var practiceUrls = [];
+    var trialsUrls = [];
+
+    // Helper to add unique URLs to an array
+    function addUniqueUrl(filename, targetArray) {
+        if (!filename) return;
+        var url = config.images[filename];
+        if (url && url !== "MISSING") {
+            if (targetArray.indexOf(url) === -1) {
+                targetArray.push(url);
+            }
+        }
+    }
+
+    // Process practice trials
+    if (config.practiceTrials) {
+        for (var i = 0; i < config.practiceTrials.length; i++) {
+            var trial = config.practiceTrials[i];
+            addUniqueUrl(trial.f1, practiceUrls);
+            addUniqueUrl(trial.f2, practiceUrls);
+        }
+    }
+
+    // Process regular trials
+    if (config.trials) {
+        for (var j = 0; j < config.trials.length; j++) {
+            var trial = config.trials[j];
+            addUniqueUrl(trial.f1, trialsUrls);
+            addUniqueUrl(trial.f2, trialsUrls);
+        }
+    }
+
+    // Filter regular trials URLs to exclude those already in practiceUrls
+    var uniqueTrialsUrls = [];
+    for (var k = 0; k < trialsUrls.length; k++) {
+        var url = trialsUrls[k];
+        if (practiceUrls.indexOf(url) === -1) {
+            uniqueTrialsUrls.push(url);
+        }
+    }
+
+    config.PRACTICE_TRIAL_IMAGE_URLS = practiceUrls;
+    config.TRIALS_IMAGES_URLS = uniqueTrialsUrls;
+})();
