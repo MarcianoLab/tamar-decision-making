@@ -18,7 +18,7 @@
    Expects trial-config.js and trial.html loaded first.
    ============================================================ */
 
-function initTrial(qualtricsContext) {
+async function initTrial(qualtricsContext) {
 
     /* ==========================================================
        CONFIGURATION
@@ -427,54 +427,29 @@ function initTrial(qualtricsContext) {
     });
 
     /* ==========================================================
-       PRELOAD IMAGES
-       ========================================================== */
-    function preloadImages(urls, callback) {
-        var loaded = 0;
-        var uniqueUrls = [];
-
-        for (var i = 0; i < urls.length; i++) {
-            if (urls[i] && urls[i] !== 'MISSING' && uniqueUrls.indexOf(urls[i]) === -1) {
-                uniqueUrls.push(urls[i]);
-            }
-        }
-
-        if (uniqueUrls.length === 0) {
-            callback();
-            return;
-        }
-
-        function onImgLoad() {
-            loaded++;
-            if (loaded >= uniqueUrls.length) {
-                callback();
-            }
-        }
-
-        for (var j = 0; j < uniqueUrls.length; j++) {
-            var img = new Image();
-            img.onload = onImgLoad;
-            img.onerror = onImgLoad;
-            img.src = uniqueUrls[j];
-        }
-    }
-
-    /* ==========================================================
        START
        ========================================================== */
-    // Hide fixation while loading so the screen is just black
-    fixation.style.display = 'none';
-
-    var urlsToPreload = [];
-    for (var i = 0; i < orderedTrials.length; i++) {
-        urlsToPreload.push(IMG[orderedTrials[i].f1]);
-        urlsToPreload.push(IMG[orderedTrials[i].f2]);
+    // Await external preload promises before starting trials.
+    // Images are assumed to already be in cache; we just wait for
+    // the preload setup/fetch to complete.
+    if (window.EXPERIMENT_IMAGE_PRELOAD_SETUP_PROMISE) {
+        await window.EXPERIMENT_IMAGE_PRELOAD_SETUP_PROMISE;
     }
 
-    preloadImages(urlsToPreload, function () {
-        // Preloading done. runTrial() will automatically show the fixation cross.
-        runTrial();
-    });
+    var preload = window.EXPERIMENT_IMAGE_PRELOAD;
+
+    if (window.isPractice) {
+        if (preload && preload.practice && preload.practice.promise) {
+            await preload.practice.promise;
+        }
+    } else {
+        if (preload && preload.trials && preload.trials.promise) {
+            await preload.trials.promise;
+        }
+    }
+
+    // runTrial() will automatically show the fixation cross.
+    runTrial();
 }
 
 
