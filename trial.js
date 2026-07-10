@@ -432,11 +432,42 @@ async function initTrial(qualtricsContext) {
     // Await external preload promises before starting trials.
     // Images are assumed to already be in cache; we just wait for
     // the preload setup/fetch to complete.
-    if (window.EXPERIMENT_IMAGE_PRELOAD_SETUP_PROMISE) {
-        await window.EXPERIMENT_IMAGE_PRELOAD_SETUP_PROMISE;
+    var loadingScreen = document.getElementById('loading-screen');
+
+    // Warning checks for missing promises
+    if (!window.EXPERIMENT_IMAGE_PRELOAD_SETUP_PROMISE) {
+        console.warn('[trial.js] window.EXPERIMENT_IMAGE_PRELOAD_SETUP_PROMISE is missing.');
     }
 
     var preload = window.EXPERIMENT_IMAGE_PRELOAD;
+    if (!preload) {
+        console.warn('[trial.js] window.EXPERIMENT_IMAGE_PRELOAD is missing.');
+    } else {
+        if (window.isPractice) {
+            if (!preload.practice || !preload.practice.promise) {
+                console.warn('[trial.js] window.EXPERIMENT_IMAGE_PRELOAD.practice.promise is missing.');
+            }
+        } else {
+            if (!preload.trials || !preload.trials.promise) {
+                console.warn('[trial.js] window.EXPERIMENT_IMAGE_PRELOAD.trials.promise is missing.');
+            }
+        }
+    }
+
+    var needsWait = window.EXPERIMENT_IMAGE_PRELOAD_SETUP_PROMISE ||
+        (preload && (
+            (window.isPractice && preload.practice && preload.practice.promise) ||
+            (!window.isPractice && preload.trials && preload.trials.promise)
+        ));
+
+    if (needsWait && loadingScreen) {
+        fixation.style.display = 'none';
+        loadingScreen.style.display = 'flex';
+    }
+
+    if (window.EXPERIMENT_IMAGE_PRELOAD_SETUP_PROMISE) {
+        await window.EXPERIMENT_IMAGE_PRELOAD_SETUP_PROMISE;
+    }
 
     if (window.isPractice) {
         if (preload && preload.practice && preload.practice.promise) {
@@ -446,6 +477,10 @@ async function initTrial(qualtricsContext) {
         if (preload && preload.trials && preload.trials.promise) {
             await preload.trials.promise;
         }
+    }
+
+    if (loadingScreen) {
+        loadingScreen.style.display = 'none';
     }
 
     // runTrial() will automatically show the fixation cross.
