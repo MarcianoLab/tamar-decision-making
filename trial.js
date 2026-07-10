@@ -429,14 +429,9 @@ async function initTrial(qualtricsContext) {
     /* ==========================================================
        START
        ========================================================== */
-    // Always show the loading screen first while awaiting preload promises.
-    // After promises resolve (or if absent), hide it and let runTrial() show the fixation cross.
+    // Loading screen is visible by default (CSS). After promises resolve,
+    // hide it and let runTrial() show the fixation cross.
     var loadingScreen = document.getElementById('loading-screen');
-
-    if (loadingScreen) {
-        fixation.style.display = 'none';
-        loadingScreen.style.display = 'flex';
-    }
 
     // Warning checks for missing promises
     if (!window.EXPERIMENT_IMAGE_PRELOAD_SETUP_PROMISE) {

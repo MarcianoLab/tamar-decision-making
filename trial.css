@@ -48,7 +48,7 @@ button[id*="Next"] {
     color: #fff;
     font-size: 100px;
     font-weight: bold;
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
     width: 100%;
@@ -57,7 +57,7 @@ button[id*="Next"] {
 
 /* --- Loading screen (shown while awaiting preload) --- */
 #loading-screen {
-    display: none;
+    display: flex;
     color: #fff;
     font-size: 24px;
     font-weight: bold;
