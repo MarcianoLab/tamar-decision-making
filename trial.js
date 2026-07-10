@@ -429,10 +429,14 @@ async function initTrial(qualtricsContext) {
     /* ==========================================================
        START
        ========================================================== */
-    // Await external preload promises before starting trials.
-    // Images are assumed to already be in cache; we just wait for
-    // the preload setup/fetch to complete.
+    // Always show the loading screen first while awaiting preload promises.
+    // After promises resolve (or if absent), hide it and let runTrial() show the fixation cross.
     var loadingScreen = document.getElementById('loading-screen');
+
+    if (loadingScreen) {
+        fixation.style.display = 'none';
+        loadingScreen.style.display = 'flex';
+    }
 
     // Warning checks for missing promises
     if (!window.EXPERIMENT_IMAGE_PRELOAD_SETUP_PROMISE) {
@@ -452,17 +456,6 @@ async function initTrial(qualtricsContext) {
                 console.warn('[trial.js] window.EXPERIMENT_IMAGE_PRELOAD.trials.promise is missing.');
             }
         }
-    }
-
-    var needsWait = window.EXPERIMENT_IMAGE_PRELOAD_SETUP_PROMISE ||
-        (preload && (
-            (window.isPractice && preload.practice && preload.practice.promise) ||
-            (!window.isPractice && preload.trials && preload.trials.promise)
-        ));
-
-    if (needsWait && loadingScreen) {
-        fixation.style.display = 'none';
-        loadingScreen.style.display = 'flex';
     }
 
     if (window.EXPERIMENT_IMAGE_PRELOAD_SETUP_PROMISE) {
