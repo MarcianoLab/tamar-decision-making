@@ -1,40 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Risk Taking Task - Local Test</title>
-    
-    <!-- Stylesheets -->
+    <title>Risk Taking Task</title>
     <link rel="stylesheet" href="trial.css">
-
-    <!-- External configurations (e.g. for standalone local testing) -->
     <script>
-        window.block = 1;
-        window.isPractice = false; // Set to true to test practice trials
+        window.isPractice = false;
     </script>
-    
-    <!-- Scripts -->
     <script src="trial-config.js"></script>
     <script src="trial.js"></script>
 </head>
+
 <body>
+    <div id="trial-overlay">
+        <div id="fixation">+</div>
+        <div id="loading-screen">Loading, please wait…</div>
+        <div id="image-row"></div>
+        <button id="next-btn">next</button>
 
-<div id="trial-overlay">
-
-    <!-- Fixation cross (shown for 1 000 ms before each trial) -->
-    <div id="fixation">+</div>
-
-    <!-- Loading screen (shown while awaiting preload promises) -->
-    <div id="loading-screen">Loading, please wait…</div>
-
-    <!-- Row: left flanker | lottery widget | right flanker -->
-    <div id="image-row"></div>
-
-    <!-- Advance to next trial (appears after a lottery choice is made) -->
-    <button id="next-btn">next</button>
-
-</div>
-
+    </div>
 </body>
+
 </html>

@@ -23,8 +23,6 @@ async function initTrial(qualtricsContext) {
     /* ==========================================================
        CONFIGURATION
        ========================================================== */
-    var BLOCK = window.block;
-
     /* Group assignment */
     var group;
     if (qualtricsContext) {
@@ -149,6 +147,11 @@ async function initTrial(qualtricsContext) {
     }
 
     var orderedTrials = randomizeTrials(activeTrials);
+
+    if (window.isTest) {
+        orderedTrials = orderedTrials.slice(0, 10);
+    }
+
 
     /* Pick a random non-control trial as the payment trial (not for practice) */
     var paymentTrialIndex = -1;
@@ -362,6 +365,9 @@ async function initTrial(qualtricsContext) {
             var target = e.target;
             while (target && target !== widget) {
                 if (target.classList.contains('lottery-option')) {
+                    // Prevent any further clicks from scheduling another advance
+                    widget.classList.remove('interactive');
+
                     // Deselect all options
                     var opts = widget.querySelectorAll('.lottery-option');
                     for (var i = 0; i < opts.length; i++) {
@@ -385,37 +391,28 @@ async function initTrial(qualtricsContext) {
                             paymentTrialChoice = selectedChoice;
                         }
 
+                        var trialData = {
+                            trial_num: trialNum,
+                            picture_valence: t.picture_valence,
+                            gamble_id: dynamicGambleId,
+                            is_control: t.is_control,
+                            is_payment_trial: (currentTrial === paymentTrialIndex) ? 1 : 0,
+                            picture_name: t._assigned_image_file,
+                            trial_type: t.lottery.type,
+                            level_percent: t.lottery.level,
+                            prize_amount: t.lottery.amount,
+                            top_color: colorGain,
+                            lottery_side: fixedOnLeftAssignment[currentTrial] ? 'left' : 'right',
+                            decision_coded: decisionCoded,
+                            rt_ms: rt,
+                            trial_timestamp: trialStartTimestamp
+                        };
+
                         if (qualtricsContext && !window.isPractice) {
-                            Qualtrics.SurveyEngine.setJSEmbeddedData(
-                                't' + trialNum,
-                                JSON.stringify({
-                                    trial_num: trialNum,
-                                    picture_valence: t.picture_valence,
-                                    gamble_id: dynamicGambleId,
-                                    is_control: t.is_control,
-                                    is_payment_trial: (currentTrial === paymentTrialIndex) ? 1 : 0,
-                                    picture_name: t._assigned_image_file,
-                                    trial_type: t.lottery.type,
-                                    level_percent: t.lottery.level,
-                                    prize_amount: t.lottery.amount,
-                                    top_color: colorGain,
-                                    lottery_side: fixedOnLeftAssignment[currentTrial] ? 'left' : 'right',
-                                    decision_coded: decisionCoded,
-                                    rt_ms: rt,
-                                    trial_timestamp: trialStartTimestamp
-                                })
-                            );
+                            Qualtrics.SurveyEngine.setJSEmbeddedData('t' + trialNum, JSON.stringify(trialData));
+                            console.log('Qualtrics saved t' + trialNum + ':', trialData);
                         } else {
-                            console.log(
-                                't' + trialNum +
-                                '  decision_coded=' + decisionCoded +
-                                '  rt=' + rt + 'ms' +
-                                '  fixed_side=' + (fixedOnLeftAssignment[currentTrial] ? 'left' : 'right') +
-                                '  [' + t.lottery.type + ' ' + t.lottery.level +
-                                '% $' + t.lottery.amount + ']' +
-                                '  valence=' + t.picture_valence +
-                                '  gamble=' + dynamicGambleId
-                            );
+                            console.log('t' + trialNum, trialData);
                         }
 
                         currentTrial++;
@@ -439,8 +436,66 @@ async function initTrial(qualtricsContext) {
     var selectedChoice = null;
     var paymentTrialChoice = null;
     var phase1Timer, phase2Timer, phase3Timer;
+    var breakShown = false;
+
+    function showBreakScreen() {
+        if (phase3Timer) clearTimeout(phase3Timer);
+        fixation.style.display = 'none';
+        imageRow.style.display = 'none';
+        nextBtn.style.display = 'none';
+
+        var breakContainer = document.createElement('div');
+        breakContainer.id = 'break-screen';
+        breakContainer.style.color = 'white';
+        breakContainer.style.textAlign = 'center';
+        breakContainer.style.fontSize = '24px';
+        breakContainer.style.marginTop = '150px';
+        breakContainer.style.fontFamily = 'Arial, sans-serif';
+
+        var msg1 = document.createElement('div');
+        msg1.innerText = 'Break time!';
+        msg1.style.marginBottom = '20px';
+        msg1.style.fontWeight = 'bold';
+
+        var msg2 = document.createElement('div');
+        msg2.innerText = 'When you are ready to continue, please press the continue button.';
+        msg2.style.marginBottom = '40px';
+
+        var btn = document.createElement('button');
+        btn.innerHTML = 'Continue &nbsp;&nbsp;&gt;';
+        btn.style.backgroundColor = '#2c7bc0';
+        btn.style.color = '#ffffff';
+        btn.style.border = '2px solid #000000';
+        btn.style.borderRadius = '6px';
+        btn.style.padding = '15px 40px';
+        btn.style.fontSize = '22px';
+        btn.style.cursor = 'pointer';
+        btn.style.outline = 'none';
+        btn.style.boxShadow = 'inset 0 0 0 1px #64a6df';
+        btn.style.transition = 'background-color 0.2s';
+
+        btn.onmouseover = function () { btn.style.backgroundColor = '#22639a'; };
+        btn.onmouseout = function () { btn.style.backgroundColor = '#2c7bc0'; };
+
+        btn.onclick = function () {
+            breakShown = true;
+            breakContainer.remove();
+            runTrial();
+        };
+
+        breakContainer.appendChild(msg1);
+        breakContainer.appendChild(msg2);
+        breakContainer.appendChild(btn);
+
+        overlay.appendChild(breakContainer);
+    }
 
     function runTrial() {
+        if (!window.isPractice && currentTrial === Math.floor(orderedTrials.length / 2) && !breakShown) {
+            showBreakScreen();
+            return;
+        }
+
         if (currentTrial >= orderedTrials.length) {
             /* All trials done — clean up and advance */
             if (overlay) overlay.remove();
@@ -453,8 +508,8 @@ async function initTrial(qualtricsContext) {
                 var pTrial = orderedTrials[paymentTrialIndex];
                 var winAmount = 0;
 
-                if (paymentTrialChoice === 'sure') {
-                    winAmount = -fixedAmount;
+                if (paymentTrialChoice === 'fixed') {
+                    winAmount = fixedAmount;
                 } else {
                     var chance = 0;
                     if (pTrial.lottery.type === 'risk') {
@@ -466,7 +521,7 @@ async function initTrial(qualtricsContext) {
                     }
 
                     if (Math.random() * 100 <= chance) {
-                        winAmount = -pTrial.lottery.amount;
+                        winAmount = pTrial.lottery.amount;
                     } else {
                         winAmount = 0;
                     }
