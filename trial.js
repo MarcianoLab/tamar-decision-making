@@ -409,7 +409,7 @@ async function initTrial(qualtricsContext) {
                         };
 
                         if (qualtricsContext && !window.isPractice) {
-                            Qualtrics.SurveyEngine.setJSEmbeddedData('t' + trialNum, JSON.stringify(trialData));
+                            Qualtrics.SurveyEngine.setEmbeddedData('t' + trialNum, JSON.stringify(trialData));
                             console.log('Qualtrics saved t' + trialNum + ':', trialData);
                         } else {
                             console.log('t' + trialNum, trialData);
@@ -528,7 +528,7 @@ async function initTrial(qualtricsContext) {
                 }
 
                 if (qualtricsContext) {
-                    Qualtrics.SurveyEngine.setJSEmbeddedData('win_amount', winAmount);
+                    Qualtrics.SurveyEngine.setEmbeddedData('win_amount', winAmount);
                 } else {
                     console.log('--- EXPERIMENT OVER ---');
                     console.log('Payment Trial: #' + (paymentTrialIndex + 1) + ' (' + pTrial.lottery.type + ')');
