@@ -41,49 +41,73 @@ async function initTrial(qualtricsContext) {
        LOAD CONFIG
        ========================================================== */
     if (!window.TRIAL_CONFIG) {
-        console.error('[trial.js] window.TRIAL_CONFIG not defined. ' +
-            'Load trial-config.js before trial.js.');
-        return;
+        throw new Error('[trial.js] window.TRIAL_CONFIG not defined. Load trial-config.js before trial.js.');
     }
 
-    var fixationMs = window.TRIAL_CONFIG.fixationMs !== undefined ? window.TRIAL_CONFIG.fixationMs : 1000;
-    var flankerOnlyMs = window.TRIAL_CONFIG.flankerOnlyMs !== undefined ? window.TRIAL_CONFIG.flankerOnlyMs : 2000;
-    var displayNonInteractiveMs = window.TRIAL_CONFIG.displayNonInteractiveMs !== undefined ? window.TRIAL_CONFIG.displayNonInteractiveMs : 2000;
-    var autoAdvanceDelayMs = window.TRIAL_CONFIG.autoAdvanceDelayMs !== undefined ? window.TRIAL_CONFIG.autoAdvanceDelayMs : 500;
-    var fixedAmount = window.TRIAL_CONFIG.fixedAmount !== undefined ? window.TRIAL_CONFIG.fixedAmount : 5;
-    var IMG = window.TRIAL_CONFIG.images;
-    var SET1 = window.TRIAL_CONFIG.trials;
+    var fixationMs = window.TRIAL_CONFIG.fixationMs;
+    var flankerOnlyMs = window.TRIAL_CONFIG.flankerOnlyMs;
+    var displayNonInteractiveMs = window.TRIAL_CONFIG.displayNonInteractiveMs;
+    var autoAdvanceDelayMs = window.TRIAL_CONFIG.autoAdvanceDelayMs;
+    var fixedAmount = window.TRIAL_CONFIG.fixedAmount;
+    var trials = window.TRIAL_CONFIG.trials;
     var SET_PRACTICE_TRIALS = window.TRIAL_CONFIG.practiceTrials;
 
-    /* Set 2: same trials, offset trial_num by 49 */
-    var SET2 = SET1.map(function (t) {
-        return {
-            trial_num: t.trial_num + 49,
-            f1: t.f1, f2: t.f2, ft: t.ft,
-            lottery: t.lottery
-        };
-    });
+    if (fixationMs === undefined || flankerOnlyMs === undefined || displayNonInteractiveMs === undefined ||
+        autoAdvanceDelayMs === undefined || fixedAmount === undefined || trials === undefined || SET_PRACTICE_TRIALS === undefined) {
+        throw new Error('[trial.js] One or more required configuration parameters are undefined in TRIAL_CONFIG.');
+    }
 
-    /* Select correct set */
-    var trials;
+    /* ==========================================================
+       IMAGE QUEUE SETUP
+       ----------------------------------------------------------
+       Shuffle the keys of each image list into arrays.
+       During trial execution, images are popped from the
+       appropriate queue so each image appears exactly once.
+       ========================================================== */
+
+    // Fisher-Yates shuffle (in-place)
+    function shuffleArray(arr) {
+        for (var i = arr.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+        }
+        return arr;
+    }
+
+    // Build shuffled key arrays from image maps
+    var negImageQueue = shuffleArray(Object.keys(window.TRIAL_CONFIG.negative_images || {}));
+    var neuImageQueue = shuffleArray(Object.keys(window.TRIAL_CONFIG.neutral_images || {}));
+    var practiceImageQueue = shuffleArray(Object.keys(window.TRIAL_CONFIG.practice_images || {}));
+
+    // Lookup helpers — resolve filename → URL from the correct image map
+    function getNegImageUrl(filename) {
+        return (window.TRIAL_CONFIG.negative_images || {})[filename] || null;
+    }
+    function getNeuImageUrl(filename) {
+        return (window.TRIAL_CONFIG.neutral_images || {})[filename] || null;
+    }
+    function getPracticeImageUrl(filename) {
+        return (window.TRIAL_CONFIG.practice_images || {})[filename] || null;
+    }
+
+    /* Select correct trial set */
+    var activeTrials;
     if (window.isPractice) {
-        trials = SET_PRACTICE_TRIALS;
-    } else if (BLOCK === 1) {
-        trials = (group === 'A') ? SET1 : SET2;
+        activeTrials = SET_PRACTICE_TRIALS;
     } else {
-        trials = (group === 'A') ? SET2 : SET1;
+        activeTrials = trials;
     }
 
     /* ==========================================================
        GORILLA RANDOMIZATION
-       No more than 2 consecutive same flanker type.
+       No more than 2 consecutive same picture_valence.
        ========================================================== */
     function randomizeTrials(spreadsheet) {
         var result = [];
         var arr = [];
         var len = spreadsheet.length;
         var k = 0;
-        var i, j, rand, ft;
+        var i, j, rand, pv;
 
         for (j = 0; j < len; j++) arr.push(j);
 
@@ -98,7 +122,7 @@ async function initTrial(qualtricsContext) {
             }
 
             rand = arr[Math.floor(Math.random() * arr.length)];
-            ft = spreadsheet[rand].ft;
+            pv = spreadsheet[rand].picture_valence;
 
             if (result.length < 2) {
                 result.push(spreadsheet[rand]);
@@ -108,8 +132,8 @@ async function initTrial(qualtricsContext) {
                 continue;
             }
 
-            if (ft === result[result.length - 1].ft &&
-                ft === result[result.length - 2].ft) {
+            if (pv === result[result.length - 1].picture_valence &&
+                pv === result[result.length - 2].picture_valence) {
                 continue;
             }
 
@@ -121,7 +145,21 @@ async function initTrial(qualtricsContext) {
         return result;
     }
 
-    var orderedTrials = randomizeTrials(trials);
+    var orderedTrials = randomizeTrials(activeTrials);
+
+    /* Pick a random non-control trial as the payment trial (not for practice) */
+    var paymentTrialIndex = -1;
+    if (!window.isPractice) {
+        var nonControlIndices = [];
+        for (var i = 0; i < orderedTrials.length; i++) {
+            if (!orderedTrials[i].is_control) {
+                nonControlIndices.push(i);
+            }
+        }
+        if (nonControlIndices.length > 0) {
+            paymentTrialIndex = nonControlIndices[Math.floor(Math.random() * nonControlIndices.length)];
+        }
+    }
 
     /* Generate counterbalanced fixed-side assignment:
        Exactly half the trials have the fixed option on the left,
@@ -140,23 +178,32 @@ async function initTrial(qualtricsContext) {
         return arr;
     })();
 
-    /* Save trial order */
-    if (qualtricsContext) {
-        Qualtrics.SurveyEngine.setJSEmbeddedData(
-            'trial_order_b' + BLOCK,
-            JSON.stringify(orderedTrials.map(function (t) {
-                return {
-                    trial_num: t.trial_num,
-                    flanker: t.f1,
-                    flanker_type: t.ft,
-                    lottery_type: t.lottery.type,
-                    lottery_level: t.lottery.level,
-                    lottery_amount: t.lottery.amount,
-                    lottery_color: t.lottery.color_gain
-                };
-            }))
-        );
+    /* ==========================================================
+       ASSIGN IMAGES TO TRIALS
+       ----------------------------------------------------------
+       Pop from the shuffled queues so each image is used once.
+       Store the assigned filename + URL on each trial object.
+       ========================================================== */
+    for (var ti = 0; ti < orderedTrials.length; ti++) {
+        var t = orderedTrials[ti];
+        var imgFile, imgUrl;
+
+        if (window.isPractice) {
+            imgFile = practiceImageQueue.length > 0 ? practiceImageQueue.pop() : null;
+            imgUrl = imgFile ? getPracticeImageUrl(imgFile) : null;
+        } else if (t.picture_valence === 'neg') {
+            imgFile = negImageQueue.length > 0 ? negImageQueue.pop() : null;
+            imgUrl = imgFile ? getNegImageUrl(imgFile) : null;
+        } else {
+            imgFile = neuImageQueue.length > 0 ? neuImageQueue.pop() : null;
+            imgUrl = imgFile ? getNeuImageUrl(imgFile) : null;
+        }
+
+        t._assigned_image_file = imgFile || 'NONE';
+        t._assigned_image_url = (imgUrl && imgUrl !== 'MISSING') ? imgUrl : null;
     }
+
+
 
     /* ==========================================================
        DOM REFERENCES
@@ -321,27 +368,50 @@ async function initTrial(qualtricsContext) {
                     target.classList.add('selected');
                     selectedChoice = target.dataset.choice;
 
-                    // Automatically advance to the next trial after 500ms
+                    // Automatically advance to the next trial after autoAdvanceDelayMs
                     setTimeout(function () {
                         var rt = Date.now() - choiceStartTime;
                         var t = orderedTrials[currentTrial];
+                        var trialNum = currentTrial + 1; // 1-based presentation order
 
-                        if (qualtricsContext) {
+                        var decisionCoded = (selectedChoice === 'lottery') ? 1 : 0;
+                        var prefix = t.is_control ? 'C' : (t.lottery.type === 'risk' ? 'G' : 'A');
+                        var dynamicGambleId = prefix + t.lottery.amount + '-' + t.lottery.level;
+
+                        if (currentTrial === paymentTrialIndex) {
+                            paymentTrialChoice = selectedChoice;
+                        }
+
+                        if (qualtricsContext && !window.isPractice) {
                             Qualtrics.SurveyEngine.setJSEmbeddedData(
-                                'choice_t' + t.trial_num, selectedChoice);
-                            Qualtrics.SurveyEngine.setJSEmbeddedData(
-                                'rt_t' + t.trial_num, rt);
-                            Qualtrics.SurveyEngine.setJSEmbeddedData(
-                                'fixed_side_t' + t.trial_num,
-                                fixedOnLeftAssignment[currentTrial] ? 'left' : 'right');
+                                't' + trialNum,
+                                JSON.stringify({
+                                    trial_num: trialNum,
+                                    picture_valence: t.picture_valence,
+                                    gamble_id: dynamicGambleId,
+                                    is_control: t.is_control,
+                                    is_payment_trial: (currentTrial === paymentTrialIndex) ? 1 : 0,
+                                    picture_name: t._assigned_image_file,
+                                    trial_type: t.lottery.type,
+                                    level_percent: t.lottery.level,
+                                    prize_amount: t.lottery.amount,
+                                    top_color: colorGain,
+                                    lottery_side: fixedOnLeftAssignment[currentTrial] ? 'left' : 'right',
+                                    decision_coded: decisionCoded,
+                                    rt_ms: rt,
+                                    trial_timestamp: trialStartTimestamp
+                                })
+                            );
                         } else {
                             console.log(
-                                'Trial ' + t.trial_num +
-                                '  choice=' + selectedChoice +
+                                't' + trialNum +
+                                '  decision_coded=' + decisionCoded +
                                 '  rt=' + rt + 'ms' +
                                 '  fixed_side=' + (fixedOnLeftAssignment[currentTrial] ? 'left' : 'right') +
                                 '  [' + t.lottery.type + ' ' + t.lottery.level +
-                                '% $' + t.lottery.amount + ']'
+                                '% $' + t.lottery.amount + ']' +
+                                '  valence=' + t.picture_valence +
+                                '  gamble=' + dynamicGambleId
                             );
                         }
 
@@ -362,7 +432,9 @@ async function initTrial(qualtricsContext) {
        ========================================================== */
     var currentTrial = 0;
     var choiceStartTime = 0;
+    var trialStartTimestamp = 0;
     var selectedChoice = null;
+    var paymentTrialChoice = null;
     var phase1Timer, phase2Timer, phase3Timer;
 
     function runTrial() {
@@ -372,6 +444,42 @@ async function initTrial(qualtricsContext) {
             var bgStyle = document.getElementById('trial-bg');
             if (bgStyle) bgStyle.remove();
             document.body.style.backgroundColor = '';
+
+            /* --- RUN PAYMENT LOTTERY --- */
+            if (!window.isPractice && paymentTrialIndex !== -1 && paymentTrialChoice) {
+                var pTrial = orderedTrials[paymentTrialIndex];
+                var winAmount = 0;
+                
+                if (paymentTrialChoice === 'sure') {
+                    winAmount = -fixedAmount;
+                } else {
+                    var chance = 0;
+                    if (pTrial.lottery.type === 'risk') {
+                        chance = pTrial.lottery.level;
+                    } else if (pTrial.lottery.type === 'ambiguity') {
+                        var minChance = (100 - pTrial.lottery.level) / 2;
+                        var maxChance = minChance + pTrial.lottery.level;
+                        chance = minChance + Math.random() * (maxChance - minChance);
+                    }
+                    
+                    if (Math.random() * 100 <= chance) {
+                        winAmount = -pTrial.lottery.amount;
+                    } else {
+                        winAmount = 0;
+                    }
+                }
+                
+                if (qualtricsContext) {
+                    Qualtrics.SurveyEngine.setJSEmbeddedData('win_amount', winAmount);
+                } else {
+                    console.log('--- EXPERIMENT OVER ---');
+                    console.log('Payment Trial: #' + (paymentTrialIndex + 1) + ' (' + pTrial.lottery.type + ')');
+                    console.log('Choice: ' + paymentTrialChoice);
+                    console.log('Lottery Chance to hit: ' + chance + '%');
+                    console.log('win_amount = ' + winAmount);
+                }
+            }
+
             if (qualtricsContext) {
                 qualtricsContext.clickNextButton();
             }
@@ -384,15 +492,16 @@ async function initTrial(qualtricsContext) {
         if (phase3Timer) {
             clearTimeout(phase3Timer);
         }
+        trialStartTimestamp = Date.now();
         fixation.style.display = 'flex';
         imageRow.style.display = 'none';
         imageRow.innerHTML = '';
         nextBtn.style.display = 'none';
         selectedChoice = null;
 
-        /* --- Build flanker images --- */
-        var leftFlanker = buildImage(IMG[t.f1]);
-        var rightFlanker = buildImage(IMG[t.f2]);
+        /* --- Build flanker images (both sides show the same image) --- */
+        var leftFlanker = buildImage(t._assigned_image_url);
+        var rightFlanker = buildImage(t._assigned_image_url);
 
         /* --- Build lottery widget (hidden initially) --- */
         var fixedOnLeft = fixedOnLeftAssignment[currentTrial];
