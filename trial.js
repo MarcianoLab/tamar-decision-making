@@ -106,18 +106,18 @@ async function initTrial(qualtricsContext) {
         var result = [];
         var arr = [];
         var len = spreadsheet.length;
-        var k = 0;
+        var failures = 0;
         var i, j, rand, pv;
 
         for (j = 0; j < len; j++) arr.push(j);
 
         while (result.length < len) {
-            k += 1;
-            if (k > 100) {
+            if (failures > 50) {
+                // Dead end reached (e.g. only one valence left), restart sequence
                 arr = [];
                 for (j = 0; j < len; j++) arr.push(j);
                 result = [];
-                k = 0;
+                failures = 0;
                 continue;
             }
 
@@ -129,11 +129,13 @@ async function initTrial(qualtricsContext) {
                 for (i = 0; i < arr.length; i++) {
                     if (arr[i] === rand) { arr.splice(i, 1); break; }
                 }
+                failures = 0;
                 continue;
             }
 
             if (pv === result[result.length - 1].picture_valence &&
                 pv === result[result.length - 2].picture_valence) {
+                failures += 1;
                 continue;
             }
 
@@ -141,6 +143,7 @@ async function initTrial(qualtricsContext) {
             for (i = 0; i < arr.length; i++) {
                 if (arr[i] === rand) { arr.splice(i, 1); break; }
             }
+            failures = 0;
         }
         return result;
     }
@@ -449,7 +452,7 @@ async function initTrial(qualtricsContext) {
             if (!window.isPractice && paymentTrialIndex !== -1 && paymentTrialChoice) {
                 var pTrial = orderedTrials[paymentTrialIndex];
                 var winAmount = 0;
-                
+
                 if (paymentTrialChoice === 'sure') {
                     winAmount = -fixedAmount;
                 } else {
@@ -461,14 +464,14 @@ async function initTrial(qualtricsContext) {
                         var maxChance = minChance + pTrial.lottery.level;
                         chance = minChance + Math.random() * (maxChance - minChance);
                     }
-                    
+
                     if (Math.random() * 100 <= chance) {
                         winAmount = -pTrial.lottery.amount;
                     } else {
                         winAmount = 0;
                     }
                 }
-                
+
                 if (qualtricsContext) {
                     Qualtrics.SurveyEngine.setJSEmbeddedData('win_amount', winAmount);
                 } else {
