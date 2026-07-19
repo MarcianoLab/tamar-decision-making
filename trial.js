@@ -185,11 +185,6 @@ async function initTrial(qualtricsContext) {
 
         block1Length = block1Trials.length;
         orderedTrials = block1Trials.concat(block2Trials);
-
-        console.log('[trial.js] Group ' + groupNum +
-            ' | colorGain=' + colorGain +
-            ' | block1=' + (riskFirst ? 'risk' : 'ambiguity') + ' (' + block1Trials.length + ')' +
-            ' | block2=' + (riskFirst ? 'ambiguity' : 'risk') + ' (' + block2Trials.length + ')');
     }
 
     if (window.isTest) {
@@ -471,7 +466,7 @@ async function initTrial(qualtricsContext) {
                             trial_timestamp: trialStartTimestamp
                         };
 
-                        if (qualtricsContext && !window.isPractice) {
+                        if (qualtricsContext) {
                             Qualtrics.SurveyEngine.setJSEmbeddedData('t' + trialNum, JSON.stringify(trialData));
                         } else {
                             console.log('t' + trialNum, trialData);
