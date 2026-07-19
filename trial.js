@@ -28,19 +28,10 @@ async function initTrial(qualtricsContext) {
        2 = Blue colorGain, ambiguity first
        3 = Red  colorGain, risk first
        4 = Red  colorGain, ambiguity first */
-    var group;
-    if (qualtricsContext) {
-        group = "${e://Field/group}";
-    } else {
-        group = '1';
-    }
-    var groupNum = parseInt(group, 10);
+    var groupNum = parseInt(window.group, 10);
 
     var colorGain = (groupNum <= 2) ? 'blue' : 'red';
     var riskFirst = (groupNum === 1 || groupNum === 3);
-
-    console.log(colorGain)
-    console.log(riskFirst)
 
     /* ==========================================================
        LOAD CONFIG
