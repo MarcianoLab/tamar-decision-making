@@ -319,22 +319,22 @@ window.TRIAL_CONFIG = {
          Neutral  (7): 4 ambiguity + 3 risk
          Levels randomized for now.
          ---------------------------------------------------------- */
-      // --- negative controls ---
+      // --- ambiguity controls ---
       { picture_valence: "neg", is_control: true, lottery: { type: "ambiguity", level: 24, amount: 5 } },
       { picture_valence: "neg", is_control: true, lottery: { type: "ambiguity", level: 50, amount: 5 } },
       { picture_valence: "neg", is_control: true, lottery: { type: "ambiguity", level: 74, amount: 5 } },
-      { picture_valence: "neg", is_control: true, lottery: { type: "ambiguity", level: 100, amount: 5 } },
-      { picture_valence: "neg", is_control: true, lottery: { type: "risk", level: 25, amount: 5 } },
-      { picture_valence: "neg", is_control: true, lottery: { type: "risk", level: 50, amount: 5 } },
-      { picture_valence: "neg", is_control: true, lottery: { type: "risk", level: 75, amount: 5 } },
-      // --- neutral controls ---
+      { picture_valence: "neu", is_control: true, lottery: { type: "ambiguity", level: 100, amount: 5 } },
       { picture_valence: "neu", is_control: true, lottery: { type: "ambiguity", level: 24, amount: 5 } },
       { picture_valence: "neu", is_control: true, lottery: { type: "ambiguity", level: 50, amount: 5 } },
       { picture_valence: "neu", is_control: true, lottery: { type: "ambiguity", level: 74, amount: 5 } },
-      { picture_valence: "neu", is_control: true, lottery: { type: "ambiguity", level: 100, amount: 5 } },
+      // --- risk controls ---
       { picture_valence: "neu", is_control: true, lottery: { type: "risk", level: 25, amount: 5 } },
       { picture_valence: "neu", is_control: true, lottery: { type: "risk", level: 50, amount: 5 } },
       { picture_valence: "neu", is_control: true, lottery: { type: "risk", level: 75, amount: 5 } },
+      { picture_valence: "neg", is_control: true, lottery: { type: "risk", level: 25, amount: 5 } },
+      { picture_valence: "neg", is_control: true, lottery: { type: "risk", level: 50, amount: 5 } },
+      { picture_valence: "neg", is_control: true, lottery: { type: "risk", level: 75, amount: 5 } },
+      { picture_valence: "neg", is_control: true, lottery: { type: "risk", level: 25, amount: 5 } },
    ],
 
    /* ==========================================================
@@ -359,13 +359,13 @@ window.TRIAL_CONFIG = {
    var config = window.TRIAL_CONFIG;
    if (!config) return;
 
-   // Helper to collect non-MISSING URLs from an image map
+   // Helper to collect URLs from an image map
    function collectUrls(imageMap) {
       var urls = [];
       var keys = Object.keys(imageMap);
       for (var i = 0; i < keys.length; i++) {
          var url = imageMap[keys[i]];
-         if (url && url !== "MISSING" && urls.indexOf(url) === -1) {
+         if (url && urls.indexOf(url) === -1) {
             urls.push(url);
          }
       }
