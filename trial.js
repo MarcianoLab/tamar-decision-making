@@ -39,6 +39,9 @@ async function initTrial(qualtricsContext) {
     var colorGain = (groupNum <= 2) ? 'blue' : 'red';
     var riskFirst = (groupNum === 1 || groupNum === 3);
 
+    console.log(colorGain)
+    console.log(riskFirst)
+
     /* ==========================================================
        LOAD CONFIG
        ========================================================== */
