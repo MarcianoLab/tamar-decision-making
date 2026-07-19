@@ -75,6 +75,8 @@ async function initTrial(qualtricsContext) {
     // Build shuffled key arrays from image maps
     var negImageQueue = shuffleArray(Object.keys(window.TRIAL_CONFIG.negative_images || {}));
     var neuImageQueue = shuffleArray(Object.keys(window.TRIAL_CONFIG.neutral_images || {}));
+    var ctrlNegImageQueue = shuffleArray(Object.keys(window.TRIAL_CONFIG.control_negative_images || {}));
+    var ctrlNeuImageQueue = shuffleArray(Object.keys(window.TRIAL_CONFIG.control_neutral_images || {}));
     var practiceImageQueue = shuffleArray(Object.keys(window.TRIAL_CONFIG.practice_images || {}));
 
     // Lookup helpers — resolve filename → URL from the correct image map
@@ -83,6 +85,12 @@ async function initTrial(qualtricsContext) {
     }
     function getNeuImageUrl(filename) {
         return (window.TRIAL_CONFIG.neutral_images || {})[filename] || null;
+    }
+    function getCtrlNegImageUrl(filename) {
+        return (window.TRIAL_CONFIG.control_negative_images || {})[filename] || null;
+    }
+    function getCtrlNeuImageUrl(filename) {
+        return (window.TRIAL_CONFIG.control_neutral_images || {})[filename] || null;
     }
     function getPracticeImageUrl(filename) {
         return (window.TRIAL_CONFIG.practice_images || {})[filename] || null;
@@ -197,6 +205,12 @@ async function initTrial(qualtricsContext) {
         if (window.isPractice) {
             imgFile = practiceImageQueue.length > 0 ? practiceImageQueue.pop() : null;
             imgUrl = imgFile ? getPracticeImageUrl(imgFile) : null;
+        } else if (t.is_control && t.picture_valence === 'neg') {
+            imgFile = ctrlNegImageQueue.length > 0 ? ctrlNegImageQueue.pop() : null;
+            imgUrl = imgFile ? getCtrlNegImageUrl(imgFile) : null;
+        } else if (t.is_control && t.picture_valence === 'neu') {
+            imgFile = ctrlNeuImageQueue.length > 0 ? ctrlNeuImageQueue.pop() : null;
+            imgUrl = imgFile ? getCtrlNeuImageUrl(imgFile) : null;
         } else if (t.picture_valence === 'neg') {
             imgFile = negImageQueue.length > 0 ? negImageQueue.pop() : null;
             imgUrl = imgFile ? getNegImageUrl(imgFile) : null;

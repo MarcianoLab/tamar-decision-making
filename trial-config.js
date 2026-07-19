@@ -84,34 +84,46 @@ window.TRIAL_CONFIG = {
       "6561_neg.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_WU1Rfy3eloYj1EB",
       "3230_neg.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_E4m0giUerheu5Lt",
       "2141_neg.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_fEasRlOi3z5n2iJ",
-      "2455_neg.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_AxOdin0StBHoMEw",
       "2301_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_qgHipkjCWTxktnm",
       "2717_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_91lbNPG9RdCyh40",
       "3300_neg.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_dYzPIg8lTssbmbI",
-      "2055.1_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_YT3AmaF52knyCqH",
-      "6311_neg.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_vSIAIJgfzvgEC74",
       "9426_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_WxDiWqAjOu0sLlZ",
       "9415_neg.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_ILFGmS4Njtg1kUg",
       "6825_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_hg5ylNoR5IqVCSb",
       "2053_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_HBUtxHaxicL16zx",
-      "6831_neg.bmp": "MISSING",
-      "3550_neg.bmp": "MISSING",
-      "8230_neg.bmp": "MISSING",
-      "9400_neg.bmp": "MISSING",
+      "6831_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_RMuH7phf3VQn3Mm",
+      "3550_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_EuBgid4qaCfWySf",
+      "8230_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_8xaGCnMjx225TtC",
+      "9400_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_HTycbIMvXCMRgjh",
       "9427_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_ib0bQK65D7hsE4l",
       "9428_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_2z3nDPI3p6C5Bfq",
       "9429_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_G4coNCnzIvAcivC",
+      "9424_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_RPavNawyxMJ2C7I",
+      "6244_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_fjRnxZaiwOpzgEG",
+      "9530_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_ZSQdq5U2trZrKJ0",
+      "9491_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_w5kW9d5S4PNvtOn",
+      "9900_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_STHfUJaiLbkll2z",
+      "4621_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_pRO6b7iedL34UFz",
+   },
+
+   control_negative_images: {
+      "2055.1_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_YT3AmaF52knyCqH",
+      "2455_neg.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_AxOdin0StBHoMEw",
+      "6311_neg.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_vSIAIJgfzvgEC74",
       "9435_neg.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_1P55YiBXlOYQ0U3",
-      // --- placeholders to reach 49 ---
-      "placeholder_neg_41.jpg": "MISSING",
-      "placeholder_neg_42.jpg": "MISSING",
-      "placeholder_neg_43.jpg": "MISSING",
-      "placeholder_neg_44.jpg": "MISSING",
-      "placeholder_neg_45.jpg": "MISSING",
-      "placeholder_neg_46.jpg": "MISSING",
-      "placeholder_neg_47.jpg": "MISSING",
-      "placeholder_neg_48.jpg": "MISSING",
-      "placeholder_neg_49.jpg": "MISSING",
+      "9160_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_YkINP1KH6V08iAS",
+      "6562_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_N95azkiLCJd73gj",
+      "6242_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_Sn2xcSaRkA5l9Gl",
+   },
+
+   control_neutral_images: {
+      "2513_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_bcCk5s7BFJZhfLe",
+      "2518_neut.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_U7yRxFnILbtWttt",
+      "2032_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_rTIkbWol137WBU8",
+      "2235_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_IEa3NjaAn4Q3wVv",
+      "2211_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_De9xgJKU5r5QTWs",
+      "2372_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_grggxJx2RFzxach",
+      "2597_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_dw7VnwEga8MZcQz",
    },
 
    /* ==========================================================
@@ -137,14 +149,12 @@ window.TRIAL_CONFIG = {
       "2870_neut.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_S944YwNBSmRvMwY",
       "2308_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_Mb6iTQ0lmP1Q2XJ",
       "2579_neut.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_nMbGzOwWbOdg1Aj",
-      "2513_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_bcCk5s7BFJZhfLe",
       "2745.1_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_8jgR4d7kH8mEzVt",
       "2397_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_JngF9hpdhze7Dwy",
       "2393_neut.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_uZdUsRLWl7qTROT",
       "2580_neut.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_mghwXOX5NcN4PGl",
       "2214_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_AeeejmV2an6wQi2",
       "2411_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_iHqYJTzs5RiD9JH",
-      "2518_neut.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_U7yRxFnILbtWttt",
       "2488_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_nsHteBGWpPnQ9KZ",
       "2396_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_weI25Rl6nVbImhc",
       "2377_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_IXDDmAUX9YbfUUA",
@@ -159,28 +169,24 @@ window.TRIAL_CONFIG = {
       "2495_neut.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_0QzdylqeJ5zasoS",
       "8311_neut.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_uO3k6Bv0Qj5Tbwf",
       "8312_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_84VgqilIWvAA8p7",
-      // --- placeholders to reach 49 ---
-      "placeholder_neut_41.jpg": "MISSING",
-      "placeholder_neut_42.jpg": "MISSING",
-      "placeholder_neut_43.jpg": "MISSING",
-      "placeholder_neut_44.jpg": "MISSING",
-      "placeholder_neut_45.jpg": "MISSING",
-      "placeholder_neut_46.jpg": "MISSING",
-      "placeholder_neut_47.jpg": "MISSING",
-      "placeholder_neut_48.jpg": "MISSING",
-      "placeholder_neut_49.jpg": "MISSING",
+      "2506_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_wZ2rJSW997jAkcH",
+      "2384_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_VwoS7bDWQG5I1H6",
+      "2484_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_jK1axx0jDlDlv4D",
+      "9070_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_fNlTymlN6735fz5",
    },
 
    /* ==========================================================
-      PRACTICE IMAGE LIST (6 images — one per practice trial)
+      PRACTICE IMAGE LIST (8 images — one per practice trial)
       ========================================================== */
    practice_images: {
-      "2394_neut.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_5lxgbEa3yaEPMIs",
-      "2700_neg.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_uBcToCowu1VT2iL",
-      "2359_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_IlAF9vg4iD1pTPW",
-      "2276_neg.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_chGjHXVvAwWrCN2",
-      "2107_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_JhKecVuww9vrL09",
-      "9332_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_NVE4R3ecPnMhCPF",
+      "5410.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_8gCIzZgMKT5hOP2",
+      "9404.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_y5AA9kGEo8R8Jm1",
+      "2795.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_Krjj2a24KU0Pl4I",
+      "2320.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_2amwc45GKmy0zS5",
+      "2205.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_QLn8U9PdJEMDcsJ",
+      "2594.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_Ff5QEfLRNkyfQ4G",
+      "6213.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_UshFsxIkeIPg71j",
+      "2560.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_7NEKi0cDA6gDajV"
    },
 
    /* ==========================================================
@@ -332,7 +338,7 @@ window.TRIAL_CONFIG = {
    ],
 
    /* ==========================================================
-      PRACTICE TRIALS (6)
+      PRACTICE TRIALS (8)
       Mix of risk / ambiguity, amounts, and picture valences.
       ========================================================== */
    practiceTrials: [
@@ -341,6 +347,8 @@ window.TRIAL_CONFIG = {
       { picture_valence: "neg", is_control: false, lottery: { type: "risk", level: 75, amount: 25 } },
       { picture_valence: "neu", is_control: false, lottery: { type: "ambiguity", level: 24, amount: 8 } },
       { picture_valence: "neu", is_control: false, lottery: { type: "risk", level: 25, amount: 12 } },
+      { picture_valence: "neg", is_control: false, lottery: { type: "ambiguity", level: 74, amount: 25 } },
+      { picture_valence: "neg", is_control: false, lottery: { type: "risk", level: 75, amount: 25 } },
       { picture_valence: "neg", is_control: false, lottery: { type: "ambiguity", level: 74, amount: 25 } }
    ]
 
@@ -372,6 +380,12 @@ window.TRIAL_CONFIG = {
    }
    if (config.neutral_images) {
       config.TRIALS_IMAGES_URLS = config.TRIALS_IMAGES_URLS.concat(collectUrls(config.neutral_images));
+   }
+   if (config.control_negative_images) {
+      config.TRIALS_IMAGES_URLS = config.TRIALS_IMAGES_URLS.concat(collectUrls(config.control_negative_images));
+   }
+   if (config.control_neutral_images) {
+      config.TRIALS_IMAGES_URLS = config.TRIALS_IMAGES_URLS.concat(collectUrls(config.control_neutral_images));
    }
 
    // Deduplicate (in case practice images overlap with trial images)
