@@ -23,17 +23,21 @@ async function initTrial(qualtricsContext) {
     /* ==========================================================
        CONFIGURATION
        ========================================================== */
-    /* Group assignment */
+    /* Group assignment (1-4 between-subjects)
+       1 = Blue colorGain, risk first
+       2 = Blue colorGain, ambiguity first
+       3 = Red  colorGain, risk first
+       4 = Red  colorGain, ambiguity first */
     var group;
     if (qualtricsContext) {
         group = "${e://Field/group}";
     } else {
-        group = 'A';
+        group = '1';
     }
+    var groupNum = parseInt(group, 10);
 
-    /* color_gain is a between-subject variable derived from group:
-       Group A → blue (gain side), all others → red */
-    var colorGain = (group === 'A') ? 'blue' : 'red';
+    var colorGain = (groupNum <= 2) ? 'blue' : 'red';
+    var riskFirst = (groupNum === 1 || groupNum === 3);
 
     /* ==========================================================
        LOAD CONFIG
@@ -96,14 +100,6 @@ async function initTrial(qualtricsContext) {
         return (window.TRIAL_CONFIG.practice_images || {})[filename] || null;
     }
 
-    /* Select correct trial set */
-    var activeTrials;
-    if (window.isPractice) {
-        activeTrials = SET_PRACTICE_TRIALS;
-    } else {
-        activeTrials = trials;
-    }
-
     /* ==========================================================
        GORILLA RANDOMIZATION
        No more than 2 consecutive same picture_valence.
@@ -154,7 +150,47 @@ async function initTrial(qualtricsContext) {
         return result;
     }
 
-    var orderedTrials = randomizeTrials(activeTrials);
+    /* ==========================================================
+       BLOCK CONSTRUCTION
+       ----------------------------------------------------------
+       Split trials into risk and ambiguity blocks (by lottery.type).
+       Each block is randomized independently.
+       Block order is determined by the group variable (riskFirst).
+       Practice trials are not split into blocks.
+       ========================================================== */
+    var orderedTrials;
+    var block1Length = 0; // index where block 2 starts (used for break)
+
+    if (window.isPractice) {
+        orderedTrials = randomizeTrials(SET_PRACTICE_TRIALS);
+    } else {
+        var riskTrials = [];
+        var ambiguityTrials = [];
+        for (var s = 0; s < trials.length; s++) {
+            if (trials[s].lottery.type === 'risk') {
+                riskTrials.push(trials[s]);
+            } else {
+                ambiguityTrials.push(trials[s]);
+            }
+        }
+
+        var block1Trials, block2Trials;
+        if (riskFirst) {
+            block1Trials = randomizeTrials(riskTrials);
+            block2Trials = randomizeTrials(ambiguityTrials);
+        } else {
+            block1Trials = randomizeTrials(ambiguityTrials);
+            block2Trials = randomizeTrials(riskTrials);
+        }
+
+        block1Length = block1Trials.length;
+        orderedTrials = block1Trials.concat(block2Trials);
+
+        console.log('[trial.js] Group ' + groupNum +
+            ' | colorGain=' + colorGain +
+            ' | block1=' + (riskFirst ? 'risk' : 'ambiguity') + ' (' + block1Trials.length + ')' +
+            ' | block2=' + (riskFirst ? 'ambiguity' : 'risk') + ' (' + block2Trials.length + ')');
+    }
 
     if (window.isTest) {
         orderedTrials = orderedTrials.slice(0, 10);
@@ -405,8 +441,21 @@ async function initTrial(qualtricsContext) {
                             paymentTrialChoice = selectedChoice;
                         }
 
+                        var blockNum = (!window.isPractice && currentTrial >= block1Length) ? 2 : 1;
+                        var blockType = '';
+                        if (!window.isPractice) {
+                            if (blockNum === 1) {
+                                blockType = riskFirst ? 'risk' : 'ambiguity';
+                            } else {
+                                blockType = riskFirst ? 'ambiguity' : 'risk';
+                            }
+                        }
+
                         var trialData = {
                             trial_num: trialNum,
+                            group: groupNum,
+                            block_number: blockNum,
+                            block_type: blockType,
                             picture_valence: t.picture_valence,
                             gamble_id: dynamicGambleId,
                             is_control: t.is_control,
@@ -451,7 +500,7 @@ async function initTrial(qualtricsContext) {
     var phase1Timer, phase2Timer, phase3Timer;
     var breakShown = false;
 
-    function showBreakScreen() {
+    function showBreakScreen(completedBlockType, nextBlockType) {
         if (phase3Timer) clearTimeout(phase3Timer);
         fixation.style.display = 'none';
         imageRow.style.display = 'none';
@@ -466,13 +515,23 @@ async function initTrial(qualtricsContext) {
         breakContainer.style.fontFamily = 'Arial, sans-serif';
 
         var msg1 = document.createElement('div');
-        msg1.innerText = 'Break time!';
         msg1.style.marginBottom = '20px';
         msg1.style.fontWeight = 'bold';
 
         var msg2 = document.createElement('div');
-        msg2.innerText = 'When you are ready to continue, please press the continue button.';
         msg2.style.marginBottom = '40px';
+
+        if (completedBlockType) {
+            var completedLabel = completedBlockType.charAt(0).toUpperCase() + completedBlockType.slice(1);
+            var nextLabel = nextBlockType ? (nextBlockType.charAt(0).toUpperCase() + nextBlockType.slice(1)) : '';
+            msg1.innerText = 'You have completed the ' + completedLabel + ' block. Break time!';
+            msg2.innerText = nextLabel
+                ? 'The next block is the ' + nextLabel + ' block. When you are ready to continue, please press the continue button.'
+                : 'When you are ready to continue, please press the continue button.';
+        } else {
+            msg1.innerText = 'Break time!';
+            msg2.innerText = 'When you are ready to continue, please press the continue button.';
+        }
 
         var btn = document.createElement('button');
         btn.innerHTML = 'Continue &nbsp;&nbsp;&gt;';
@@ -504,8 +563,10 @@ async function initTrial(qualtricsContext) {
     }
 
     function runTrial() {
-        if (!window.isPractice && currentTrial === Math.floor(orderedTrials.length / 2) && !breakShown) {
-            showBreakScreen();
+        if (!window.isPractice && block1Length > 0 && currentTrial === block1Length && !breakShown) {
+            var completedType = riskFirst ? 'risk' : 'ambiguity';
+            var nextType = riskFirst ? 'ambiguity' : 'risk';
+            showBreakScreen(completedType, nextType);
             return;
         }
 

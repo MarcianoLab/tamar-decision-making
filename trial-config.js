@@ -9,6 +9,18 @@
      Lottery:      lose `amount` dollars with probability `level`%
                    (color_gain side), or $0 otherwise.
 
+   BETWEEN-SUBJECTS GROUPS (4 levels, set via "group" embedded data):
+     1 = Blue colorGain, risk block first
+     2 = Blue colorGain, ambiguity block first
+     3 = Red  colorGain, risk block first
+     4 = Red  colorGain, ambiguity block first
+
+   BLOCKS:
+     All trials are split by lottery.type into a risk block and
+     an ambiguity block (each including their own controls).
+     Block order is determined by the group variable.
+     A break screen is shown between the two blocks.
+
    Each trial has:
      trial_num        – unique trial ID (1–98)
      picture_valence  – "neg" | "neu"
@@ -22,10 +34,9 @@
        color_gain – which bar color carries the non-zero loss: "red" | "blue"
 
    TRIAL COUNT:
-     Risk  (non-control):  3 levels × 3 amounts × 2 valences × 2 reps = 36
-     Ambiguity (non-ctrl): 4 levels × 3 amounts × 2 valences × 2 reps = 48
-     Control  ($5):        7 neg (3 ambig + 4 risk) + 7 neu (4 ambig + 3 risk) = 14
-                                                                    Total = 98
+     Risk block:     36 non-control + 7 controls = 43
+     Ambiguity block: 48 non-control + 7 controls = 55
+                                              Total = 98
    ============================================================ */
 
 window.TRIAL_CONFIG = {
