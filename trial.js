@@ -252,6 +252,30 @@ async function initTrial(qualtricsContext) {
 
 
     /* ==========================================================
+       DYNAMIC QUALTRICS BACKGROUND OVERRIDES
+       ========================================================== */
+    var bgStyle = document.getElementById('trial-bg');
+    if (!bgStyle) {
+        bgStyle = document.createElement('style');
+        bgStyle.id = 'trial-bg';
+        bgStyle.textContent = [
+            'body,',
+            'html,',
+            '#Wrapper,',
+            '#Page,',
+            '#SkinContent,',
+            '.SkinInner,',
+            '#SurveyEngineBody,',
+            '#Questions,',
+            '.QuestionOuter,',
+            '.QuestionBody {',
+            '    background: #000 !important;',
+            '}'
+        ].join('\n');
+        (document.head || document.documentElement).appendChild(bgStyle);
+    }
+
+    /* ==========================================================
        DOM REFERENCES
        ========================================================== */
     var overlay = document.getElementById('trial-overlay');

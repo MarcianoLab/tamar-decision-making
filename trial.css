@@ -3,20 +3,6 @@
    Qualtrics overrides + trial overlay + lottery widget
    ============================================================ */
 
-/* --- Qualtrics background overrides --- */
-body,
-html,
-#Wrapper,
-#Page,
-#SkinContent,
-.SkinInner,
-#SurveyEngineBody,
-#Questions,
-.QuestionOuter,
-.QuestionBody {
-    background: #000 !important;
-}
-
 .QuestionText,
 .question-text {
     display: none !important;
