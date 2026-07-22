@@ -305,7 +305,7 @@ async function initTrial(qualtricsContext) {
 
         var fixedLabel = document.createElement('div');
         fixedLabel.className = 'lottery-amount-label';
-        fixedLabel.textContent = '$' + fixedAmount;
+        fixedLabel.textContent = fixedAmount;
         fixedOpt.appendChild(fixedLabel);
 
         /* --- OR divider --- */
@@ -328,7 +328,7 @@ async function initTrial(qualtricsContext) {
         topRow.className = 'lottery-outcome-column';
         var topLabel = document.createElement('span');
         topLabel.className = 'lottery-amount-label small';
-        topLabel.textContent = topAmount > 0 ? '$' + topAmount : '$0';
+        topLabel.textContent = topAmount > 0 ? topAmount : '0';
         topRow.appendChild(topLabel);
         gambleOpt.appendChild(topRow);
 
@@ -382,7 +382,7 @@ async function initTrial(qualtricsContext) {
         botRow.className = 'lottery-outcome-column flex-reverse';
         var botLabel = document.createElement('span');
         botLabel.className = 'lottery-amount-label small';
-        botLabel.textContent = bottomAmount > 0 ? '-$' + bottomAmount : '$0';
+        botLabel.textContent = bottomAmount;
         botRow.appendChild(botLabel);
         gambleOpt.appendChild(botRow);
 
