@@ -177,12 +177,13 @@ async function initTrial(qualtricsContext) {
             block2Trials = randomizeTrials(riskTrials);
         }
 
+        if (window.isTest) {
+            block1Trials = block1Trials.slice(0, 5);
+            block2Trials = block2Trials.slice(0, 5);
+        }
+
         block1Length = block1Trials.length;
         orderedTrials = block1Trials.concat(block2Trials);
-    }
-
-    if (window.isTest) {
-        orderedTrials = orderedTrials.slice(0, 10);
     }
 
 
@@ -497,30 +498,29 @@ async function initTrial(qualtricsContext) {
 
         var breakContainer = document.createElement('div');
         breakContainer.id = 'break-screen';
-        breakContainer.style.color = 'white';
-        breakContainer.style.textAlign = 'center';
+        breakContainer.style.position = 'fixed';
+        breakContainer.style.top = '0';
+        breakContainer.style.left = '0';
+        breakContainer.style.width = '100vw';
+        breakContainer.style.height = '100vh';
+        breakContainer.style.backgroundColor = '#ffffff';
+        breakContainer.style.color = '#000000';
+        breakContainer.style.display = 'flex';
+        breakContainer.style.flexDirection = 'column';
+        breakContainer.style.alignItems = 'center';
+        breakContainer.style.justifyContent = 'center';
+        breakContainer.style.zIndex = '1000000';
         breakContainer.style.fontSize = '24px';
-        breakContainer.style.marginTop = '150px';
         breakContainer.style.fontFamily = 'Arial, sans-serif';
 
         var msg1 = document.createElement('div');
         msg1.style.marginBottom = '20px';
         msg1.style.fontWeight = 'bold';
+        msg1.innerText = 'Break time!';
 
         var msg2 = document.createElement('div');
         msg2.style.marginBottom = '40px';
-
-        if (completedBlockType) {
-            var completedLabel = completedBlockType.charAt(0).toUpperCase() + completedBlockType.slice(1);
-            var nextLabel = nextBlockType ? (nextBlockType.charAt(0).toUpperCase() + nextBlockType.slice(1)) : '';
-            msg1.innerText = 'You have completed the ' + completedLabel + ' block. Break time!';
-            msg2.innerText = nextLabel
-                ? 'The next block is the ' + nextLabel + ' block. When you are ready to continue, please press the continue button.'
-                : 'When you are ready to continue, please press the continue button.';
-        } else {
-            msg1.innerText = 'Break time!';
-            msg2.innerText = 'When you are ready to continue, please press the continue button.';
-        }
+        msg2.innerText = 'When you are ready to continue, please press the continue button.';
 
         var btn = document.createElement('button');
         btn.innerHTML = 'Continue &nbsp;&nbsp;&gt;';
