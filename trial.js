@@ -75,7 +75,9 @@ async function initTrial(qualtricsContext) {
     var neuImageQueue = shuffleArray(Object.keys(window.TRIAL_CONFIG.neutral_images || {}));
     var ctrlNegImageQueue = shuffleArray(Object.keys(window.TRIAL_CONFIG.control_negative_images || {}));
     var ctrlNeuImageQueue = shuffleArray(Object.keys(window.TRIAL_CONFIG.control_neutral_images || {}));
-    var practiceImageQueue = shuffleArray(Object.keys(window.TRIAL_CONFIG.practice_images || {}));
+
+    // Do not shuffle images for practice
+    var practiceImageQueue = Object.keys(window.TRIAL_CONFIG.practice_images || {});
 
     // Lookup helpers — resolve filename → URL from the correct image map
     function getNegImageUrl(filename) {
@@ -156,7 +158,8 @@ async function initTrial(qualtricsContext) {
     var block1Length = 0; // index where block 2 starts (used for break)
 
     if (window.isPractice) {
-        orderedTrials = randomizeTrials(SET_PRACTICE_TRIALS);
+        // Do not shuffle trials for practice
+        orderedTrials = SET_PRACTICE_TRIALS;
     } else {
         var riskTrials = [];
         var ambiguityTrials = [];
