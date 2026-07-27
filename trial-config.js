@@ -128,13 +128,13 @@ window.TRIAL_CONFIG = {
    },
 
    control_neutral_images: {
-      "2513_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_bcCk5s7BFJZhfLe",
       "2518_neut.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_U7yRxFnILbtWttt",
-      "2032_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_rTIkbWol137WBU8",
       "2235_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_IEa3NjaAn4Q3wVv",
       "2211_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_De9xgJKU5r5QTWs",
       "2372_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_grggxJx2RFzxach",
       "2597_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_dw7VnwEga8MZcQz",
+	  "2514_neut.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_H7RlkrIEbqpDsh2",
+	  "2026_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_7UiEXEozpIXJlON",
    },
 
    /* ==========================================================
@@ -142,15 +142,15 @@ window.TRIAL_CONFIG = {
       At runtime these keys are shuffled and popped for each neu trial.
       ========================================================== */
    neutral_images: {
+	  "2513_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_bcCk5s7BFJZhfLe",
+	  "2032_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_rTIkbWol137WBU8",
       "2394_neut.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_5lxgbEa3yaEPMIs",
       "2359_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_IlAF9vg4iD1pTPW",
       "4605_neut.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_Iu4ReFTKEAjN8zh",
       "2305_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_5ULiEyToDlcDKJP",
-      "2026_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_7UiEXEozpIXJlON",
       "7493_neut.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_qREp8l9C9zQwX3S",
       "2273_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_t3fLwedy3hFjegH",
       "2749_neut.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_URFHRBm9Ln640as",
-      "2514_neut.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_H7RlkrIEbqpDsh2",
       "2107_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_JhKecVuww9vrL09",
       "2850_neut.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_n4vAdlCqBJc3pY0",
       "2485_neut.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_tQ5JXa2GBF6v4tJ",
