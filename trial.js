@@ -681,16 +681,6 @@ async function initTrial(qualtricsContext) {
     }
 
     /* ==========================================================
-       BLOCK ACCIDENTAL KEYBOARD ADVANCES
-       ========================================================== */
-    document.addEventListener('keydown', function (e) {
-        if (e.which === 13 || e.which === 32) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-    });
-
-    /* ==========================================================
        START
        ========================================================== */
     // Loading screen is visible by default (CSS). After promises resolve,
