@@ -47,10 +47,30 @@ async function initTrial(qualtricsContext) {
     var fixedAmount = window.TRIAL_CONFIG.fixedAmount;
     var trials = window.TRIAL_CONFIG.trials;
     var SET_PRACTICE_TRIALS = window.TRIAL_CONFIG.practiceTrials;
+    var defaultFrame = window.TRIAL_CONFIG.frame === undefined ? 'gain' : window.TRIAL_CONFIG.frame;
 
     if (fixationMs === undefined || flankerOnlyMs === undefined || displayNonInteractiveMs === undefined ||
         autoAdvanceDelayMs === undefined || fixedAmount === undefined || trials === undefined || SET_PRACTICE_TRIALS === undefined) {
         throw new Error('[trial.js] One or more required configuration parameters are undefined in TRIAL_CONFIG.');
+    }
+
+    function getFrame(lottery) {
+        return lottery.frame === undefined ? defaultFrame : lottery.frame;
+    }
+
+    function signedAmount(amount, lottery) {
+        return getFrame(lottery) === 'loss' ? -Math.abs(amount) : Math.abs(amount);
+    }
+
+    if (defaultFrame !== 'gain' && defaultFrame !== 'loss') {
+        throw new Error('[trial.js] TRIAL_CONFIG.frame must be "gain" or "loss".');
+    }
+    var activeTrials = window.isPractice ? SET_PRACTICE_TRIALS : trials;
+    for (var frameIndex = 0; frameIndex < activeTrials.length; frameIndex++) {
+        var frame = getFrame(activeTrials[frameIndex].lottery);
+        if (frame !== 'gain' && frame !== 'loss') {
+            throw new Error('[trial.js] lottery.frame must be "gain" or "loss" at trial ' + (frameIndex + 1) + '.');
+        }
     }
 
     /* ==========================================================
@@ -73,6 +93,7 @@ async function initTrial(qualtricsContext) {
     // Build shuffled key arrays from image maps
     var negImageQueue = shuffleArray(Object.keys(window.TRIAL_CONFIG.negative_images || {}));
     var neuImageQueue = shuffleArray(Object.keys(window.TRIAL_CONFIG.neutral_images || {}));
+    var highThreatImageQueue = shuffleArray(Object.keys(window.TRIAL_CONFIG.high_threat_images || {}));
     var ctrlNegImageQueue = shuffleArray(Object.keys(window.TRIAL_CONFIG.control_negative_images || {}));
     var ctrlNeuImageQueue = shuffleArray(Object.keys(window.TRIAL_CONFIG.control_neutral_images || {}));
 
@@ -85,6 +106,9 @@ async function initTrial(qualtricsContext) {
     }
     function getNeuImageUrl(filename) {
         return (window.TRIAL_CONFIG.neutral_images || {})[filename] || null;
+    }
+    function getHighThreatImageUrl(filename) {
+        return (window.TRIAL_CONFIG.high_threat_images || {})[filename] || null;
     }
     function getCtrlNegImageUrl(filename) {
         return (window.TRIAL_CONFIG.control_negative_images || {})[filename] || null;
@@ -161,32 +185,33 @@ async function initTrial(qualtricsContext) {
         // Do not shuffle trials for practice
         orderedTrials = SET_PRACTICE_TRIALS;
     } else {
-        var riskTrials = [];
-        var ambiguityTrials = [];
-        for (var s = 0; s < trials.length; s++) {
-            if (trials[s].lottery.type === 'risk') {
-                riskTrials.push(trials[s]);
-            } else {
-                ambiguityTrials.push(trials[s]);
-            }
-        }
-
-        var block1Trials, block2Trials;
-        if (riskFirst) {
-            block1Trials = randomizeTrials(riskTrials);
-            block2Trials = randomizeTrials(ambiguityTrials);
-        } else {
-            block1Trials = randomizeTrials(ambiguityTrials);
-            block2Trials = randomizeTrials(riskTrials);
-        }
-
-        if (window.isTest) {
-            block1Trials = block1Trials.slice(0, 5);
-            block2Trials = block2Trials.slice(0, 5);
-        }
-
-        block1Length = block1Trials.length;
-        orderedTrials = block1Trials.concat(block2Trials);
+        orderedTrials = trials;
+        // var riskTrials = [];
+        // var ambiguityTrials = [];
+        // for (var s = 0; s < trials.length; s++) {
+        //     if (trials[s].lottery.type === 'risk') {
+        //         riskTrials.push(trials[s]);
+        //     } else {
+        //         ambiguityTrials.push(trials[s]);
+        //     }
+        // }
+        //
+        // var block1Trials, block2Trials;
+        // if (riskFirst) {
+        //     block1Trials = randomizeTrials(riskTrials);
+        //     block2Trials = randomizeTrials(ambiguityTrials);
+        // } else {
+        //     block1Trials = randomizeTrials(ambiguityTrials);
+        //     block2Trials = randomizeTrials(riskTrials);
+        // }
+        //
+        // if (window.isTest) {
+        //     block1Trials = block1Trials.slice(0, 5);
+        //     block2Trials = block2Trials.slice(0, 5);
+        // }
+        //
+        // block1Length = block1Trials.length;
+        // orderedTrials = block1Trials.concat(block2Trials);
     }
 
 
@@ -234,6 +259,9 @@ async function initTrial(qualtricsContext) {
         if (window.isPractice) {
             imgFile = practiceImageQueue.length > 0 ? practiceImageQueue.pop() : null;
             imgUrl = imgFile ? getPracticeImageUrl(imgFile) : null;
+        } else if (t.picture_valence === 'high_threat') {
+            imgFile = highThreatImageQueue.length > 0 ? highThreatImageQueue.pop() : null;
+            imgUrl = imgFile ? getHighThreatImageUrl(imgFile) : null;
         } else if (t.is_control && t.picture_valence === 'neg') {
             imgFile = ctrlNegImageQueue.length > 0 ? ctrlNegImageQueue.pop() : null;
             imgUrl = imgFile ? getCtrlNegImageUrl(imgFile) : null;
@@ -310,12 +338,12 @@ async function initTrial(qualtricsContext) {
        LOTTERY WIDGET BUILDER
         ----------------------------------------------------------
         Builds the center decision widget:
-          Left panel:  Fixed $500 (icon + label)
+          Fixed panel: Sure amount, signed according to the trial frame
           OR divider
           Right panel: Lottery (top-icon, probability rect, bottom-icon)
 
-        Gain is always displayed on top; its color is color_gain (red or blue).
-        The opposite color is always the bottom (loss / $0) outcome.
+        The non-zero outcome is always on top, in the group's assigned color.
+        The opposite color is always the bottom ($0) outcome.
         - Risk:      top segment = level%, bottom segment = (100-level)%.
         - Ambiguity: grey bar occludes the middle; visible areas are equal.
 
@@ -332,7 +360,7 @@ async function initTrial(qualtricsContext) {
 
         var fixedLabel = document.createElement('div');
         fixedLabel.className = 'lottery-amount-label';
-        fixedLabel.textContent = fixedAmount;
+        fixedLabel.textContent = signedAmount(fixedAmount, lottery);
         fixedOpt.appendChild(fixedLabel);
 
         /* --- OR divider --- */
@@ -344,9 +372,9 @@ async function initTrial(qualtricsContext) {
         gambleOpt.className = 'lottery-option lottery-gamble';
         gambleOpt.dataset.choice = 'lottery';
 
-        // Gain is always on top; colorGain (derived from group) sets the top segment's color
-        var topAmount = lottery.amount;   // gain always on top
-        var bottomAmount = 0;             // loss ($0) always on bottom
+        // The signed non-zero outcome stays on top in both frames.
+        var topAmount = signedAmount(lottery.amount, lottery);
+        var bottomAmount = 0;
         var topColor = colorGain;                               // 'red' or 'blue'
         var bottomColor = colorGain === 'red' ? 'blue' : 'red';
 
@@ -355,7 +383,7 @@ async function initTrial(qualtricsContext) {
         topRow.className = 'lottery-outcome-column';
         var topLabel = document.createElement('span');
         topLabel.className = 'lottery-amount-label small';
-        topLabel.textContent = topAmount > 0 ? topAmount : '0';
+        topLabel.textContent = topAmount;
         topRow.appendChild(topLabel);
         gambleOpt.appendChild(topRow);
 
@@ -364,7 +392,7 @@ async function initTrial(qualtricsContext) {
         rect.className = 'lottery-rect';
 
         if (lottery.type === 'risk' || lottery.type === 'control') {
-            // Risky: top segment = gain color at level%, bottom = loss color at (100-level)%
+            // Risky: top segment = non-zero outcome at level%, bottom = zero otherwise
             var topPct = lottery.level;
             var bottomPct = 100 - lottery.level;
 
@@ -379,7 +407,7 @@ async function initTrial(qualtricsContext) {
             rect.appendChild(botSeg);
 
         } else {
-            // Ambiguous: grey bar occludes the middle; top = gain color, bottom = loss color
+            // Ambiguous: grey bar occludes the middle between the outcome colors
             var visEach = (100 - lottery.level) / 2;
 
             if (visEach > 0) {
@@ -481,6 +509,9 @@ async function initTrial(qualtricsContext) {
                             trial_type: t.lottery.type,
                             level_percent: t.lottery.level,
                             prize_amount: t.lottery.amount,
+                            frame: getFrame(t.lottery),
+                            fixed_amount: signedAmount(fixedAmount, t.lottery),
+                            lottery_amount: signedAmount(t.lottery.amount, t.lottery),
                             top_color: colorGain,
                             lottery_side: fixedOnLeftAssignment[currentTrial] ? 'left' : 'right',
                             decision_coded: decisionCoded,
@@ -599,7 +630,7 @@ async function initTrial(qualtricsContext) {
                 var winAmount = 0;
 
                 if (paymentTrialChoice === 'fixed') {
-                    winAmount = fixedAmount;
+                    winAmount = signedAmount(fixedAmount, pTrial.lottery);
                 } else {
                     var chance = 0;
                     if (pTrial.lottery.type === 'risk') {
@@ -611,7 +642,7 @@ async function initTrial(qualtricsContext) {
                     }
 
                     if (Math.random() * 100 <= chance) {
-                        winAmount = pTrial.lottery.amount;
+                        winAmount = signedAmount(pTrial.lottery.amount, pTrial.lottery);
                     } else {
                         winAmount = 0;
                     }

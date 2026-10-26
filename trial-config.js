@@ -1,13 +1,14 @@
 /* ============================================================
-   TRIAL CONFIGURATION  —  Dan et al. (2025) loss-only design
+   TRIAL CONFIGURATION  —  Gain and loss scenarios
    ----------------------------------------------------------
    Edit this file to change timings, image URLs, or trials.
    Load BEFORE trial.js.
 
-   FRAME: Loss
-     Sure option:  fixed loss of –$5 (see fixedAmount below).
-     Lottery:      lose `amount` dollars with probability `level`%
-                   (color_gain side), or $0 otherwise.
+   FRAME: Set frame to "gain" or "loss" (default: "gain").
+     Sure option:  gain or lose fixedAmount dollars.
+     Lottery:      gain or lose `amount` dollars with probability
+                   `level`% (top color), or $0 otherwise.
+     Amounts stay positive in this file; frame determines their sign.
 
    BETWEEN-SUBJECTS GROUPS (4 levels, set via "group" embedded data):
      1 = Blue colorGain, risk block first
@@ -17,26 +18,27 @@
 
    BLOCKS:
      All trials are split by lottery.type into a risk block and
-     an ambiguity block (each including their own controls).
+     an ambiguity block.
      Block order is determined by the group variable.
      A break screen is shown between the two blocks.
 
    Each trial has:
      trial_num        – unique trial ID (1–98)
-     picture_valence  – "neg" | "neu"
+     picture_valence  – "neg" | "neu" | "high_threat"
      gamble_id        – unique gamble identifier ("G01", "G02", …)
      is_control       – true | false
      lottery          – the monetary decision task:
+       frame      – optional "gain" | "loss" override for this trial
        type       – "risk" or "ambiguity"
-       level      – risk:      25 / 50 / 75    (% chance of the loss)
+       level      – risk:      25 / 50 / 75    (% chance of non-zero outcome)
                     ambiguity: 24 / 50 / 74 / 100 (% of bar occluded)
-       amount     – lottery loss magnitude: 5 (control), 8, 12, or 25
-       color_gain – which bar color carries the non-zero loss: "red" | "blue"
+       amount     – lottery magnitude: 5 (control), 8, 12, or 25
+       color_gain – which bar color carries the non-zero outcome: "red" | "blue"
 
    TRIAL COUNT:
-     Risk block:     36 non-control + 7 controls = 43
-     Ambiguity block: 48 non-control + 7 controls = 55
-                                              Total = 98
+     Risk block:      18 non-control trials
+     Ambiguity block: 18 non-control trials
+                               Total = 36
    ============================================================ */
 
 window.TRIAL_CONFIG = {
@@ -63,9 +65,14 @@ window.TRIAL_CONFIG = {
    /* ==========================================================
       TRIAL SETTINGS
       ----------------------------------------------------------
-      fixedAmount  - the sure-loss magnitude shown to the participant.
-                     Displayed as –$fixedAmount in the widget.
+      frame        - "gain" or "loss", applies to main and practice trials.
+                     A lottery.frame value overrides this for that trial.
+                     Example: lottery: { frame: "loss", type: "risk", level: 50, amount: 12 }
+                     shows a sure -5 versus a 50% chance of -12 or 0.
+      fixedAmount  - positive magnitude of the sure option.
+                     Loss trials display both this and lottery.amount negatively.
       ========================================================== */
+   frame: "gain",
    fixedAmount: 5,
 
    /* ==========================================================
@@ -73,48 +80,19 @@ window.TRIAL_CONFIG = {
       At runtime these keys are shuffled and popped for each neg trial.
       ========================================================== */
    negative_images: {
-      "2700_neg.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_uBcToCowu1VT2iL",
-      "2276_neg.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_chGjHXVvAwWrCN2",
-      "6571_neg.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_L0pRWLQA0s4i306",
-      "9332_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_NVE4R3ecPnMhCPF",
-      "9419_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_cU2Ps8SRJkKqbZe",
-      "9425_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_P4BwqDy4lpG2D49",
-      "2345.1_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_zvghA0Y3nWtxjxg",
-      "9220_neg.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_ucf6pbanRHrHLcl",
-      "6838_neg.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_xE8AnnpTjLa9Xi4",
-      "9041_neg.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_uqPaifhQO2t5Qwu",
-      "9421_neg.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_H5JgMb0oPPozy8m",
-      "3220_neg.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_IxybO4KT9M4vH2t",
-      "2710_neg.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_lAozAliPHdBq1uQ",
+      "2455_neg.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_AxOdin0StBHoMEw",
       "2456_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_bfI4FDPHGcbgbbP",
-      "2799_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_OT7Rwqti7CqqQMb",
       "2900_neg.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_Dq6cekuxlq6ejEW",
-      "3216_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_TOZuLfkIo0m7Ga3",
-      "2691_neg.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_cwuATmusAtZSKfa",
-      "2375.1_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_9pjnNP4ewPNV34l",
-      "6561_neg.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_WU1Rfy3eloYj1EB",
-      "3230_neg.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_E4m0giUerheu5Lt",
-      "2141_neg.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_fEasRlOi3z5n2iJ",
-      "2301_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_qgHipkjCWTxktnm",
-      "2717_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_91lbNPG9RdCyh40",
-      "3300_neg.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_dYzPIg8lTssbmbI",
-      "9426_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_WxDiWqAjOu0sLlZ",
-      "9415_neg.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_ILFGmS4Njtg1kUg",
-      "6825_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_hg5ylNoR5IqVCSb",
-      "2053_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_HBUtxHaxicL16zx",
-      "6831_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_RMuH7phf3VQn3Mm",
-      "3550_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_EuBgid4qaCfWySf",
-      "8230_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_8xaGCnMjx225TtC",
-      "9400_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_HTycbIMvXCMRgjh",
-      "9427_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_ib0bQK65D7hsE4l",
-      "9428_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_2z3nDPI3p6C5Bfq",
-      "9429_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_G4coNCnzIvAcivC",
-      "9424_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_RPavNawyxMJ2C7I",
-      "6244_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_fjRnxZaiwOpzgEG",
-      "9530_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_ZSQdq5U2trZrKJ0",
-      "9491_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_w5kW9d5S4PNvtOn",
-      "9900_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_STHfUJaiLbkll2z",
-      "4621_neg.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_pRO6b7iedL34UFz",
+      "9220_neg.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_ucf6pbanRHrHLcl",
+      "2455_neg1.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_AxOdin0StBHoMEw",
+      "2456_neg1.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_bfI4FDPHGcbgbbP",
+      "2900_neg1.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_Dq6cekuxlq6ejEW",
+      "9220_neg1.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_ucf6pbanRHrHLcl",
+      "2455_neg2.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_AxOdin0StBHoMEw",
+      "2456_neg2.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_bfI4FDPHGcbgbbP",
+      "2900_neg2.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_Dq6cekuxlq6ejEW",
+      "9220_neg2.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_ucf6pbanRHrHLcl",
+
    },
 
    control_negative_images: {
@@ -133,8 +111,8 @@ window.TRIAL_CONFIG = {
       "2211_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_De9xgJKU5r5QTWs",
       "2372_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_grggxJx2RFzxach",
       "2597_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_dw7VnwEga8MZcQz",
-	  "2514_neut.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_H7RlkrIEbqpDsh2",
-	  "2026_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_7UiEXEozpIXJlON",
+      "2514_neut.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_H7RlkrIEbqpDsh2",
+      "2026_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_7UiEXEozpIXJlON",
    },
 
    /* ==========================================================
@@ -142,8 +120,8 @@ window.TRIAL_CONFIG = {
       At runtime these keys are shuffled and popped for each neu trial.
       ========================================================== */
    neutral_images: {
-	  "2513_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_bcCk5s7BFJZhfLe",
-	  "2032_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_rTIkbWol137WBU8",
+      "2513_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_bcCk5s7BFJZhfLe",
+      "2032_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_rTIkbWol137WBU8",
       "2394_neut.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_5lxgbEa3yaEPMIs",
       "2359_neut.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_IlAF9vg4iD1pTPW",
       "4605_neut.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_Iu4ReFTKEAjN8zh",
@@ -187,6 +165,29 @@ window.TRIAL_CONFIG = {
    },
 
    /* ==========================================================
+      HIGH THREAT IMAGE POOL (12 images; regular trials only)
+      Random placeholders from the existing image lists.
+      These images have not been categorized by threat level.
+      Replace filenames and URLs with the intended stimuli.
+      ========================================================== */
+   high_threat_images: {
+      "8475.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_H70uJriPArPNYcu",
+      "5973.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_IgAikHhRBRCblak",
+      "9622.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_uBCQzhoPmoinlq5",
+      "8485.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_0x5pH37ljPL3roh",
+      "84751.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_H70uJriPArPNYcu",
+      "59731.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_IgAikHhRBRCblak",
+      "96221.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_uBCQzhoPmoinlq5",
+      "84851.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_0x5pH37ljPL3roh",
+      "84752.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_H70uJriPArPNYcu",
+      "59732.jpg": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_IgAikHhRBRCblak",
+      "96222.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_uBCQzhoPmoinlq5",
+      "84852.JPG": "https://hebrewuni.qualtrics.com/ControlPanel/Graphic.php?IM=IM_0x5pH37ljPL3roh",
+
+   },
+
+
+   /* ==========================================================
       PRACTICE IMAGE LIST (8 images — one per practice trial)
       ========================================================== */
    practice_images: {
@@ -201,151 +202,74 @@ window.TRIAL_CONFIG = {
    },
 
    /* ==========================================================
-      98 TRIALS
+      36 MAIN TRIALS
       ----------------------------------------------------------
-      Risk  (non-control):  3 levels (25,50,75) × 3 amounts (8,12,25) × 2 valences × 2 reps = 36
-      Ambiguity (non-ctrl): 4 levels (24,50,74,100) × 3 amounts (8,12,25) × 2 valences × 2 reps = 48
-      Control  ($5):        7 neg (3 ambig + 4 risk) + 7 neu (4 ambig + 3 risk) = 14
-                                                                         Total = 98
+      3 picture valences x 2 frames x 2 types x 3 amounts = 36.
+      Risk: 50% chance of the non-zero outcome.
+      Ambiguity: 50% of the probability bar is occluded.
+      Each category has amounts 8, 12, and 25, with no controls.
       ========================================================== */
    trials: [
-      /* ----------------------------------------------------------
-         RISK (non-control): 36 trials
-         3 levels × 3 amounts × 2 valences × 2 reps
-         ---------------------------------------------------------- */
-      // --- level 25, amount 8  [G825] ---
-      { picture_valence: "neg", is_control: false, lottery: { type: "risk", level: 25, amount: 8 } },
-      { picture_valence: "neg", is_control: false, lottery: { type: "risk", level: 25, amount: 8 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "risk", level: 25, amount: 8 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "risk", level: 25, amount: 8 } },
-      // --- level 25, amount 12  [G1225] ---
-      { picture_valence: "neg", is_control: false, lottery: { type: "risk", level: 25, amount: 12 } },
-      { picture_valence: "neg", is_control: false, lottery: { type: "risk", level: 25, amount: 12 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "risk", level: 25, amount: 12 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "risk", level: 25, amount: 12 } },
-      // --- level 25, amount 25  [G2525] ---
-      { picture_valence: "neg", is_control: false, lottery: { type: "risk", level: 25, amount: 25 } },
-      { picture_valence: "neg", is_control: false, lottery: { type: "risk", level: 25, amount: 25 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "risk", level: 25, amount: 25 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "risk", level: 25, amount: 25 } },
-      // --- level 50, amount 8  [G850] ---
-      { picture_valence: "neg", is_control: false, lottery: { type: "risk", level: 50, amount: 8 } },
-      { picture_valence: "neg", is_control: false, lottery: { type: "risk", level: 50, amount: 8 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "risk", level: 50, amount: 8 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "risk", level: 50, amount: 8 } },
-      // --- level 50, amount 12  [G1250] ---
-      { picture_valence: "neg", is_control: false, lottery: { type: "risk", level: 50, amount: 12 } },
-      { picture_valence: "neg", is_control: false, lottery: { type: "risk", level: 50, amount: 12 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "risk", level: 50, amount: 12 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "risk", level: 50, amount: 12 } },
-      // --- level 50, amount 25  [G2550] ---
-      { picture_valence: "neg", is_control: false, lottery: { type: "risk", level: 50, amount: 25 } },
-      { picture_valence: "neg", is_control: false, lottery: { type: "risk", level: 50, amount: 25 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "risk", level: 50, amount: 25 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "risk", level: 50, amount: 25 } },
-      // --- level 75, amount 8  [G875] ---
-      { picture_valence: "neg", is_control: false, lottery: { type: "risk", level: 75, amount: 8 } },
-      { picture_valence: "neg", is_control: false, lottery: { type: "risk", level: 75, amount: 8 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "risk", level: 75, amount: 8 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "risk", level: 75, amount: 8 } },
-      // --- level 75, amount 12  [G1275] ---
-      { picture_valence: "neg", is_control: false, lottery: { type: "risk", level: 75, amount: 12 } },
-      { picture_valence: "neg", is_control: false, lottery: { type: "risk", level: 75, amount: 12 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "risk", level: 75, amount: 12 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "risk", level: 75, amount: 12 } },
-      // --- level 75, amount 25  [G2575] ---
-      { picture_valence: "neg", is_control: false, lottery: { type: "risk", level: 75, amount: 25 } },
-      { picture_valence: "neg", is_control: false, lottery: { type: "risk", level: 75, amount: 25 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "risk", level: 75, amount: 25 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "risk", level: 75, amount: 25 } },
+      // 1. Neutral loss, risk
+      { picture_valence: "neu", is_control: false, lottery: { frame: "loss", type: "risk", level: 50, amount: 8 } },
+      { picture_valence: "neu", is_control: false, lottery: { frame: "loss", type: "risk", level: 50, amount: 12 } },
+      { picture_valence: "neu", is_control: false, lottery: { frame: "loss", type: "risk", level: 50, amount: 25 } },
 
-      /* ----------------------------------------------------------
-         AMBIGUITY (non-control): 48 trials
-         4 levels × 3 amounts × 2 valences × 2 reps
-         ---------------------------------------------------------- */
-      // --- level 24, amount 8  [A824] ---
-      { picture_valence: "neg", is_control: false, lottery: { type: "ambiguity", level: 24, amount: 8 } },
-      { picture_valence: "neg", is_control: false, lottery: { type: "ambiguity", level: 24, amount: 8 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "ambiguity", level: 24, amount: 8 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "ambiguity", level: 24, amount: 8 } },
-      // --- level 24, amount 12  [A1224] ---
-      { picture_valence: "neg", is_control: false, lottery: { type: "ambiguity", level: 24, amount: 12 } },
-      { picture_valence: "neg", is_control: false, lottery: { type: "ambiguity", level: 24, amount: 12 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "ambiguity", level: 24, amount: 12 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "ambiguity", level: 24, amount: 12 } },
-      // --- level 24, amount 25  [A2524] ---
-      { picture_valence: "neg", is_control: false, lottery: { type: "ambiguity", level: 24, amount: 25 } },
-      { picture_valence: "neg", is_control: false, lottery: { type: "ambiguity", level: 24, amount: 25 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "ambiguity", level: 24, amount: 25 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "ambiguity", level: 24, amount: 25 } },
-      // --- level 50, amount 8  [A850] ---
-      { picture_valence: "neg", is_control: false, lottery: { type: "ambiguity", level: 50, amount: 8 } },
-      { picture_valence: "neg", is_control: false, lottery: { type: "ambiguity", level: 50, amount: 8 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "ambiguity", level: 50, amount: 8 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "ambiguity", level: 50, amount: 8 } },
-      // --- level 50, amount 12  [A1250] ---
-      { picture_valence: "neg", is_control: false, lottery: { type: "ambiguity", level: 50, amount: 12 } },
-      { picture_valence: "neg", is_control: false, lottery: { type: "ambiguity", level: 50, amount: 12 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "ambiguity", level: 50, amount: 12 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "ambiguity", level: 50, amount: 12 } },
-      // --- level 50, amount 25  [A2550] ---
-      { picture_valence: "neg", is_control: false, lottery: { type: "ambiguity", level: 50, amount: 25 } },
-      { picture_valence: "neg", is_control: false, lottery: { type: "ambiguity", level: 50, amount: 25 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "ambiguity", level: 50, amount: 25 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "ambiguity", level: 50, amount: 25 } },
-      // --- level 74, amount 8  [A874] ---
-      { picture_valence: "neg", is_control: false, lottery: { type: "ambiguity", level: 74, amount: 8 } },
-      { picture_valence: "neg", is_control: false, lottery: { type: "ambiguity", level: 74, amount: 8 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "ambiguity", level: 74, amount: 8 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "ambiguity", level: 74, amount: 8 } },
-      // --- level 74, amount 12  [A1274] ---
-      { picture_valence: "neg", is_control: false, lottery: { type: "ambiguity", level: 74, amount: 12 } },
-      { picture_valence: "neg", is_control: false, lottery: { type: "ambiguity", level: 74, amount: 12 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "ambiguity", level: 74, amount: 12 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "ambiguity", level: 74, amount: 12 } },
-      // --- level 74, amount 25  [A2574] ---
-      { picture_valence: "neg", is_control: false, lottery: { type: "ambiguity", level: 74, amount: 25 } },
-      { picture_valence: "neg", is_control: false, lottery: { type: "ambiguity", level: 74, amount: 25 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "ambiguity", level: 74, amount: 25 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "ambiguity", level: 74, amount: 25 } },
-      // --- level 100, amount 8  [A8100] ---
-      { picture_valence: "neg", is_control: false, lottery: { type: "ambiguity", level: 100, amount: 8 } },
-      { picture_valence: "neg", is_control: false, lottery: { type: "ambiguity", level: 100, amount: 8 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "ambiguity", level: 100, amount: 8 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "ambiguity", level: 100, amount: 8 } },
-      // --- level 100, amount 12  [A12100] ---
-      { picture_valence: "neg", is_control: false, lottery: { type: "ambiguity", level: 100, amount: 12 } },
-      { picture_valence: "neg", is_control: false, lottery: { type: "ambiguity", level: 100, amount: 12 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "ambiguity", level: 100, amount: 12 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "ambiguity", level: 100, amount: 12 } },
-      // --- level 100, amount 25  [A25100] ---
-      { picture_valence: "neg", is_control: false, lottery: { type: "ambiguity", level: 100, amount: 25 } },
-      { picture_valence: "neg", is_control: false, lottery: { type: "ambiguity", level: 100, amount: 25 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "ambiguity", level: 100, amount: 25 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "ambiguity", level: 100, amount: 25 } },
+      // 2. Neutral loss, ambiguity
+      { picture_valence: "neu", is_control: false, lottery: { frame: "loss", type: "ambiguity", level: 50, amount: 8 } },
+      { picture_valence: "neu", is_control: false, lottery: { frame: "loss", type: "ambiguity", level: 50, amount: 12 } },
+      { picture_valence: "neu", is_control: false, lottery: { frame: "loss", type: "ambiguity", level: 50, amount: 25 } },
 
-      /* ----------------------------------------------------------
-         CONTROL: 14 trials  ($5 amount, is_control: true)
-         Negative (7): 3 ambiguity + 4 risk
-         Neutral  (7): 4 ambiguity + 3 risk
-         Levels randomized for now.
-         ---------------------------------------------------------- */
-      // --- ambiguity controls ---
-      { picture_valence: "neg", is_control: true, lottery: { type: "ambiguity", level: 24, amount: 5 } },
-      { picture_valence: "neg", is_control: true, lottery: { type: "ambiguity", level: 50, amount: 5 } },
-      { picture_valence: "neg", is_control: true, lottery: { type: "ambiguity", level: 74, amount: 5 } },
-      { picture_valence: "neu", is_control: true, lottery: { type: "ambiguity", level: 100, amount: 5 } },
-      { picture_valence: "neu", is_control: true, lottery: { type: "ambiguity", level: 24, amount: 5 } },
-      { picture_valence: "neu", is_control: true, lottery: { type: "ambiguity", level: 50, amount: 5 } },
-      { picture_valence: "neu", is_control: true, lottery: { type: "ambiguity", level: 74, amount: 5 } },
-      // --- risk controls ---
-      { picture_valence: "neu", is_control: true, lottery: { type: "risk", level: 25, amount: 5 } },
-      { picture_valence: "neu", is_control: true, lottery: { type: "risk", level: 50, amount: 5 } },
-      { picture_valence: "neu", is_control: true, lottery: { type: "risk", level: 75, amount: 5 } },
-      { picture_valence: "neg", is_control: true, lottery: { type: "risk", level: 25, amount: 5 } },
-      { picture_valence: "neg", is_control: true, lottery: { type: "risk", level: 50, amount: 5 } },
-      { picture_valence: "neg", is_control: true, lottery: { type: "risk", level: 75, amount: 5 } },
-      { picture_valence: "neg", is_control: true, lottery: { type: "risk", level: 25, amount: 5 } },
+      // 3. Neutral gain, risk
+      { picture_valence: "neu", is_control: false, lottery: { frame: "gain", type: "risk", level: 50, amount: 8 } },
+      { picture_valence: "neu", is_control: false, lottery: { frame: "gain", type: "risk", level: 50, amount: 12 } },
+      { picture_valence: "neu", is_control: false, lottery: { frame: "gain", type: "risk", level: 50, amount: 25 } },
+
+      // 4. Neutral gain, ambiguity
+      { picture_valence: "neu", is_control: false, lottery: { frame: "gain", type: "ambiguity", level: 50, amount: 8 } },
+      { picture_valence: "neu", is_control: false, lottery: { frame: "gain", type: "ambiguity", level: 50, amount: 12 } },
+      { picture_valence: "neu", is_control: false, lottery: { frame: "gain", type: "ambiguity", level: 50, amount: 25 } },
+
+      // 5. Negative loss, risk
+      { picture_valence: "neg", is_control: false, lottery: { frame: "loss", type: "risk", level: 50, amount: 8 } },
+      { picture_valence: "neg", is_control: false, lottery: { frame: "loss", type: "risk", level: 50, amount: 12 } },
+      { picture_valence: "neg", is_control: false, lottery: { frame: "loss", type: "risk", level: 50, amount: 25 } },
+
+      // 6. Negative loss, ambiguity
+      { picture_valence: "neg", is_control: false, lottery: { frame: "loss", type: "ambiguity", level: 50, amount: 8 } },
+      { picture_valence: "neg", is_control: false, lottery: { frame: "loss", type: "ambiguity", level: 50, amount: 12 } },
+      { picture_valence: "neg", is_control: false, lottery: { frame: "loss", type: "ambiguity", level: 50, amount: 25 } },
+
+      // 7. Negative gain, risk
+      { picture_valence: "neg", is_control: false, lottery: { frame: "gain", type: "risk", level: 50, amount: 8 } },
+      { picture_valence: "neg", is_control: false, lottery: { frame: "gain", type: "risk", level: 50, amount: 12 } },
+      { picture_valence: "neg", is_control: false, lottery: { frame: "gain", type: "risk", level: 50, amount: 25 } },
+
+      // 8. Negative gain, ambiguity
+      { picture_valence: "neg", is_control: false, lottery: { frame: "gain", type: "ambiguity", level: 50, amount: 8 } },
+      { picture_valence: "neg", is_control: false, lottery: { frame: "gain", type: "ambiguity", level: 50, amount: 12 } },
+      { picture_valence: "neg", is_control: false, lottery: { frame: "gain", type: "ambiguity", level: 50, amount: 25 } },
+
+      // 9. High threat loss, risk
+      { picture_valence: "high_threat", is_control: false, lottery: { frame: "loss", type: "risk", level: 50, amount: 8 } },
+      { picture_valence: "high_threat", is_control: false, lottery: { frame: "loss", type: "risk", level: 50, amount: 12 } },
+      { picture_valence: "high_threat", is_control: false, lottery: { frame: "loss", type: "risk", level: 50, amount: 25 } },
+
+      // 10. High threat loss, ambiguity
+      { picture_valence: "high_threat", is_control: false, lottery: { frame: "loss", type: "ambiguity", level: 50, amount: 8 } },
+      { picture_valence: "high_threat", is_control: false, lottery: { frame: "loss", type: "ambiguity", level: 50, amount: 12 } },
+      { picture_valence: "high_threat", is_control: false, lottery: { frame: "loss", type: "ambiguity", level: 50, amount: 25 } },
+
+      // 11. High threat gain, risk
+      { picture_valence: "high_threat", is_control: false, lottery: { frame: "gain", type: "risk", level: 50, amount: 8 } },
+      { picture_valence: "high_threat", is_control: false, lottery: { frame: "gain", type: "risk", level: 50, amount: 12 } },
+      { picture_valence: "high_threat", is_control: false, lottery: { frame: "gain", type: "risk", level: 50, amount: 25 } },
+
+      // 12. High threat gain, ambiguity
+      { picture_valence: "high_threat", is_control: false, lottery: { frame: "gain", type: "ambiguity", level: 50, amount: 8 } },
+      { picture_valence: "high_threat", is_control: false, lottery: { frame: "gain", type: "ambiguity", level: 50, amount: 12 } },
+      { picture_valence: "high_threat", is_control: false, lottery: { frame: "gain", type: "ambiguity", level: 50, amount: 25 } },
+
    ],
 
    /* ==========================================================
@@ -353,14 +277,14 @@ window.TRIAL_CONFIG = {
       Mix of risk / ambiguity, amounts, and picture valences.
       ========================================================== */
    practiceTrials: [
-      { picture_valence: "neu", is_control: true, lottery: { type: "risk", level: 50, amount: 5 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "ambiguity", level: 50, amount: 12 } },
-      { picture_valence: "neg", is_control: false, lottery: { type: "risk", level: 75, amount: 25 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "ambiguity", level: 24, amount: 8 } },
-      { picture_valence: "neu", is_control: false, lottery: { type: "risk", level: 25, amount: 12 } },
-      { picture_valence: "neg", is_control: false, lottery: { type: "ambiguity", level: 74, amount: 25 } },
-      { picture_valence: "neg", is_control: false, lottery: { type: "risk", level: 75, amount: 25 } },
-      { picture_valence: "neg", is_control: false, lottery: { type: "ambiguity", level: 74, amount: 25 } }
+      { picture_valence: "neu", is_control: true, lottery: { frame: "gain", type: "risk", level: 50, amount: 5 } },
+      { picture_valence: "neu", is_control: false, lottery: { frame: "gain", type: "ambiguity", level: 50, amount: 12 } },
+      { picture_valence: "neg", is_control: false, lottery: { frame: "gain", type: "risk", level: 75, amount: 25 } },
+      { picture_valence: "neu", is_control: false, lottery: { frame: "gain", type: "ambiguity", level: 24, amount: 8 } },
+      { picture_valence: "neu", is_control: false, lottery: { frame: "gain", type: "risk", level: 25, amount: 12 } },
+      { picture_valence: "neg", is_control: false, lottery: { frame: "gain", type: "ambiguity", level: 74, amount: 25 } },
+      { picture_valence: "neg", is_control: false, lottery: { frame: "gain", type: "risk", level: 75, amount: 25 } },
+      { picture_valence: "neg", is_control: false, lottery: { frame: "gain", type: "ambiguity", level: 74, amount: 25 } }
    ]
 
 };
@@ -391,6 +315,9 @@ window.TRIAL_CONFIG = {
    }
    if (config.neutral_images) {
       config.TRIALS_IMAGES_URLS = config.TRIALS_IMAGES_URLS.concat(collectUrls(config.neutral_images));
+   }
+   if (config.high_threat_images) {
+      config.TRIALS_IMAGES_URLS = config.TRIALS_IMAGES_URLS.concat(collectUrls(config.high_threat_images));
    }
    if (config.control_negative_images) {
       config.TRIALS_IMAGES_URLS = config.TRIALS_IMAGES_URLS.concat(collectUrls(config.control_negative_images));
